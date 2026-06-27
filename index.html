@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kitty’s Flower Shoppe</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">🌸 Stateless logic puzzles</p>
+      <h1 id="title">Kitty’s Flower Shoppe</h1>
+      <p>Match each customer to a bouquet and a few sweet delivery details. No timers, no accounts, just cozy deduction.</p>
+      <form id="new-game-form" class="setup-card">
+        <label>Customers
+          <select id="customer-count">
+            <option value="3">3</option><option value="4" selected>4</option><option value="5">5</option>
+          </select>
+        </label>
+        <label>Categories
+          <select id="category-count">
+            <option value="3" selected>3</option><option value="4">4</option>
+          </select>
+        </label>
+        <button type="submit">New puzzle</button>
+      </form>
+    </section>
+
+    <section class="controls" aria-label="Puzzle controls">
+      <button id="auto-fill" type="button">Auto-fill obvious Xs</button>
+      <button id="check" type="button">Check puzzle</button>
+      <button id="reveal" type="button">Reveal answer</button>
+      <p id="status" role="status" aria-live="polite">Choose a puzzle size and start matching flowers.</p>
+    </section>
+
+    <section class="game-layout">
+      <aside class="panel" aria-labelledby="cards-title">
+        <h2 id="cards-title">Order cards</h2>
+        <div id="order-cards" class="cards"></div>
+        <h2>Active categories</h2>
+        <div id="category-cards" class="catalog"></div>
+      </aside>
+      <section class="panel grid-panel" aria-labelledby="grid-title">
+        <h2>Current clue</h2>
+        <div id="clues" class="clues"></div>
+        <h2 id="grid-title">Logic grid</h2>
+        <p class="hint">Tap a cell to cycle blank → X → ✓. Drag across blank cells to mark Xs.</p>
+        <div id="grid-board" class="grid-board"></div>
+      </section>
+    </section>
+
+    <section id="celebration" class="celebration hidden" aria-live="polite"></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
