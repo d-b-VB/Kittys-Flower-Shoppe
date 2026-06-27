@@ -5,7 +5,12 @@ const actions = {bouquets:'ordered', treats:'ordered', seafoodDishes:'ordered', 
 const negativeActions = {bouquets:'did not order', treats:'did not order', seafoodDishes:'did not order', generalFoods:'did not order', drinks:'did not order', ribbons:'did not choose', occasions:'did not send flowers for', feelings:'does not feel', deliveryTimes:'did not schedule', locations:'does not visit'};
 const attrEmoji = {country:'🏳️', continent:'🗺️', texture:'🧸', hobby:'🎨', likes:'💖', dislikesOrFears:'🙀', colors:'🎨', scent:'👃', catSafety:'🐈', inside:'🚪', wetness:'💧', noise:'🔊', light:'💡', temperature:'🌡️', elevation:'⛰️', distance:'📍', tags:'🏷️'};
 const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-const itemName = item => `${item.emoji ? item.emoji + ' ' : ''}${item.name || item}`;
+const itemText = item => `${item.emoji ? item.emoji + ' ' : ''}${item.name || item}`;
+const emojiCode = emoji => [...emoji].filter(ch => ch !== '\ufe0f').map(ch => ch.codePointAt(0).toString(16)).join('_');
+const emojiMarkup = emoji => String(emoji || '').split(/\s+/).filter(Boolean).map(part => `<img class="noto-emoji" src="https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u${emojiCode(part)}.png" alt="${part}" loading="lazy" decoding="async">`).join('');
+const itemName = item => `${item.emoji ? emojiMarkup(item.emoji) + ' ' : ''}${item.name || item}`;
+const factEmoji = emoji => emojiMarkup(emoji);
+const flowerEmojiColors = {rose:['red','green'], tulip:['pink','green'], daisy:['white','yellow'], sunflower:['yellow','brown','green'], hyacinth:['purple','green'], hibiscus:['pink','yellow','green'], lotus:['pink','green'], marigold:['orange','yellow']};
 
 function flag(country){
   const map = {Argentina:'AR', Australia:'AU', Bahamas:'BS', Brazil:'BR', Canada:'CA', China:'CN', 'Costa Rica':'CR', Denmark:'DK', Finland:'FI', France:'FR', Germany:'DE', Greece:'GR', Iceland:'IS', India:'IN', Indonesia:'ID', Ireland:'IE', Japan:'JP', Kenya:'KE', Mexico:'MX', Mongolia:'MN', Morocco:'MA', Nepal:'NP', 'New Zealand':'NZ', Peru:'PE', Rwanda:'RW', Scotland:'GB', Slovenia:'SI', 'South Africa':'ZA', Spain:'ES', Switzerland:'CH', Syria:'SY', Tanzania:'TZ', Thailand:'TH', 'Türkiye':'TR', Uganda:'UG', 'United Kingdom':'GB', 'United States':'US', Wales:'GB'};
@@ -14,7 +19,7 @@ function flag(country){
 }
 function poolItems(key){
   if(key === 'characters') return seed.characters.map(c => ({...c, category:key, emoji:`${c.emoji} ${flag(c.country)}`}));
-  if(key === 'bouquets') return seed.flowers.map(f => ({...f, category:key}));
+  if(key === 'bouquets') return seed.flowers.map(f => ({...f, colors: flowerEmojiColors[f.id] || f.colors, category:key}));
   if(key === 'locations') return seed.locations.map(l => ({...l, category:key}));
   return seed.categoryPools[key].map((label, i) => {
     const parts = String(label).split(' ');
@@ -54,7 +59,7 @@ function relationText(a,b,positive=true){
 }
 function valuesFor(item, attr){ const v=item[attr]; return Array.isArray(v)?v:[v]; }
 function attrClueText(ch, cat, attr, value){
-  const phrase = cat.key === 'bouquets' ? `ordered a flower with ${attrEmoji[attr] || '🏷️'} ${value}` : `${verb(cat.key)} something with ${attrEmoji[attr] || '🏷️'} ${value}`;
+  const phrase = cat.key === 'bouquets' ? `ordered a flower with ${factEmoji(attrEmoji[attr] || '🏷️')} ${value}` : `${verb(cat.key)} something with ${factEmoji(attrEmoji[attr] || '🏷️')} ${value}`;
   return `${itemName(ch)} ${phrase}.`;
 }
 function activeSharedAttributes(cat){
@@ -132,7 +137,7 @@ function getMark(a,b){ return state.marks.get(key(a,b)) || ''; }
 function isCorrectPair(a,b){ return paired(state.puzzle,a,b); }
 function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); document.getElementById('celebration').classList.add('hidden'); }
 function renderCards(){
-  document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div><span class="tag">${flag(c.country)} ${c.country}</span><span class="tag">${c.heightDisplay}</span><span class="tag">💖 ${c.likes.join(' & ')}</span><span class="tag">🎨 ${c.hobby}</span></div></article>`).join('');
+  document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div><span class="tag">${factEmoji(flag(c.country))} ${c.country}</span><span class="tag">${c.heightDisplay}</span><span class="tag">${factEmoji('💖')} ${c.likes.join(' & ')}</span><span class="tag">${factEmoji('🎨')} ${c.hobby}</span></div></article>`).join('');
 }
 function renderCatalog(){
   const catalog = document.getElementById('category-cards');
@@ -143,7 +148,7 @@ function describeItem(item, cat){
   const clueAttrs = [...(state.puzzle.usedAttributes.get(cat.key) || [])];
   return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => item[attr] !== undefined).map(attr => {
     const value = valuesFor(item, attr).join(', ');
-    return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${attrEmoji[attr] || '🏷️'} ${attr}: ${value}`;
+    return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
   });
 }
 function renderClues(){ document.getElementById('clues').innerHTML = state.puzzle.clues.map(c => `<li>${c}</li>`).join(''); }
@@ -151,7 +156,7 @@ function renderGrid(){
   document.getElementById('grid-board').innerHTML = continuousGrid(state.puzzle.cats);
   document.querySelectorAll('.cell').forEach(cell => {
     const a = findItem(cell.dataset.a), b = findItem(cell.dataset.b);
-    const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.className = `cell ${val}`; cell.setAttribute('aria-label', `${itemName(a)} and ${itemName(b)}: ${val || 'blank'}`); };
+    const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.className = `cell ${val}`; cell.setAttribute('aria-label', `${itemText(a)} and ${itemText(b)}: ${val || 'blank'}`); };
     sync(getMark(a,b));
     cell.addEventListener('click', () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); });
     cell.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); cell.click(); } });

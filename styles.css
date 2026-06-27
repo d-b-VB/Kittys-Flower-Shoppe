@@ -80,3 +80,18 @@ th { background: #faf8ff; font-size: .82rem; padding: .25rem; }
 .continuous-grid .blank-cell { background: linear-gradient(135deg, #f6f1fb, #fff); }
 .continuous-grid .cell { background: #fff; }
 .continuous-grid .cell.yes { background: #eafff2; }
+.noto-emoji { width: 1.25em; height: 1.25em; object-fit: contain; vertical-align: -0.22em; margin-inline: .03em; }
+.cell .noto-emoji, th .noto-emoji, .rowhead .noto-emoji { width: 1.45em; height: 1.45em; }
+@media (max-width: 640px) {
+  .app-shell { padding: .65rem; }
+  .hero, .panel, .controls { border-radius: 18px; padding: .8rem; }
+  .setup-card label, .setup-card select, .setup-card button, .controls button { width: 100%; }
+  .game-layout { gap: .75rem; }
+  .catalog { max-height: 42vh; overflow: auto; padding-right: .2rem; }
+  .tag { font-size: .74rem; line-height: 1.4; }
+  .continuous-grid { max-width: calc(100vw - 1.3rem); }
+  th, td { min-width: 36px; height: 38px; }
+  .continuous-grid .rowhead { min-width: 96px; max-width: 120px; white-space: normal; font-size: .78rem; }
+  .continuous-grid .grouphead { font-size: .78rem; }
+  .cell { font-size: 1.15rem; }
+}
