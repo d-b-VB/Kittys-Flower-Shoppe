@@ -11,6 +11,10 @@ const emojiMarkup = emoji => String(emoji || '').split(/\s+/).filter(Boolean).ma
 const itemName = item => `${item.emoji ? emojiMarkup(item.emoji) + ' ' : ''}${item.name || item}`;
 const factEmoji = emoji => emojiMarkup(emoji);
 const flowerEmojiColors = {rose:['red','green'], tulip:['pink','green'], daisy:['white','yellow'], sunflower:['yellow','brown','green'], hyacinth:['purple','green'], hibiscus:['pink','yellow','green'], lotus:['pink','green'], marigold:['orange','yellow']};
+const categoryEmoji = {characters:'🐱', bouquets:'💐', locations:'📍', treats:'🍬', seafoodDishes:'🍣', generalFoods:'🍽️', drinks:'🧃', ribbons:'🎀', occasions:'🎉', feelings:'😊', deliveryTimes:'🕒'};
+const firstEmoji = item => String(item.emoji || '').split(/\s+/).filter(Boolean)[0] || '❔';
+const gridLabel = item => emojiMarkup(firstEmoji(item));
+const categoryGridLabel = key => emojiMarkup(categoryEmoji[key] || '🏷️');
 
 function flag(country){
   const map = {Argentina:'AR', Australia:'AU', Bahamas:'BS', Brazil:'BR', Canada:'CA', China:'CN', 'Costa Rica':'CR', Denmark:'DK', Finland:'FI', France:'FR', Germany:'DE', Greece:'GR', Iceland:'IS', India:'IN', Indonesia:'ID', Ireland:'IE', Japan:'JP', Kenya:'KE', Mexico:'MX', Mongolia:'MN', Morocco:'MA', Nepal:'NP', 'New Zealand':'NZ', Peru:'PE', Rwanda:'RW', Scotland:'GB', Slovenia:'SI', 'South Africa':'ZA', Spain:'ES', Switzerland:'CH', Syria:'SY', Tanzania:'TZ', Thailand:'TH', 'Türkiye':'TR', Uganda:'UG', 'United Kingdom':'GB', 'United States':'US', Wales:'GB'};
@@ -204,7 +208,17 @@ function getMark(a,b){ return state.marks.get(key(a,b)) || ''; }
 function isCorrectPair(a,b){ return paired(state.puzzle,a,b); }
 function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); document.getElementById('celebration').classList.add('hidden'); }
 function renderCards(){
-  document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div><span class="tag">${factEmoji(flag(c.country))} ${c.country}</span><span class="tag">${c.heightDisplay}</span><span class="tag">${factEmoji('💖')} ${c.likes.join(' & ')}</span><span class="tag">${factEmoji('🎨')} ${c.hobby}</span></div></article>`).join('');
+  document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div>${describeCustomer(c).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('');
+}
+function describeCustomer(customer){
+  const baseAttrs = ['country','heightDisplay','likes','hobby'];
+  const clueAttrs = [...(state.puzzle.usedAttributes.get('characters') || [])];
+  return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => customer[attr] !== undefined).map(attr => {
+    if(attr === 'heightDisplay') return customer.heightDisplay;
+    const value = valuesFor(customer, attr).join(', ');
+    if(attr === 'country') return `${factEmoji(flag(customer.country))} ${customer.country}`;
+    return `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
+  });
 }
 function renderCatalog(){
   const catalog = document.getElementById('category-cards');
@@ -240,26 +254,42 @@ function renderGrid(){
     cell.addEventListener('pointerup', () => state.dragging = false);
   });
 }
+
+function sectionKey(a,b){ return [a.key,b.key].sort().join('|'); }
+function isActiveGridPair(rowCat, colCat, others){
+  const rowOtherIndex = others.findIndex(c => c.key === rowCat.key);
+  const colOtherIndex = others.findIndex(c => c.key === colCat.key);
+  return rowCat.key !== colCat.key && (rowCat.key === 'bouquets' || colCat.key === 'characters' || colOtherIndex > rowOtherIndex);
+}
+function sectionClasses(rowCats, colCats, others){
+  const classes = new Map();
+  let sectionIndex = 0;
+  rowCats.forEach(rowCat => colCats.forEach(colCat => {
+    if(!isActiveGridPair(rowCat, colCat, others)) return;
+    classes.set(sectionKey(rowCat, colCat), sectionIndex % 2 === 0 ? 'section-purple' : 'section-white');
+    sectionIndex++;
+  }));
+  return classes;
+}
 function continuousGrid(cats){
   const chars = cats.find(c=>c.key==='characters');
   const flowers = cats.find(c=>c.key==='bouquets');
   const others = cats.filter(c=>!['characters','bouquets'].includes(c.key));
   const colCats = [chars, ...others];
   const rowCats = [flowers, ...others];
-  const headerGroups = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => `<th class="grouphead" colspan="${cat.items.length}">${cat.label}</th>`).join('')}</tr>`;
-  const headers = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => cat.items.map(i => `<th>${itemName(i)}</th>`).join('')).join('')}</tr>`;
+  const sectionClassMap = sectionClasses(rowCats, colCats, others);
+  const headerGroups = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => `<th class="grouphead" colspan="${cat.items.length}" aria-label="${cat.label}">${categoryGridLabel(cat.key)}</th>`).join('')}</tr>`;
+  const headers = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => cat.items.map(i => `<th aria-label="${itemText(i)}">${gridLabel(i)}</th>`).join('')).join('')}</tr>`;
   const rows = rowCats.map(rowCat => rowCat.items.map((rowItem, itemIndex) => {
-    const rowHeader = itemIndex === 0 ? `<th class="rowgroup" rowspan="${rowCat.items.length}">${rowCat.label}</th>` : '';
-    return `<tr>${rowHeader}<th class="rowhead">${itemName(rowItem)}</th>${colCats.map(colCat => colCat.items.map(colItem => gridCell(rowCat, rowItem, colCat, colItem, others)).join('')).join('')}</tr>`;
+    const rowHeader = itemIndex === 0 ? `<th class="rowgroup" rowspan="${rowCat.items.length}" aria-label="${rowCat.label}">${categoryGridLabel(rowCat.key)}</th>` : '';
+    return `<tr>${rowHeader}<th class="rowhead" aria-label="${itemText(rowItem)}">${gridLabel(rowItem)}</th>${colCats.map(colCat => colCat.items.map(colItem => gridCell(rowCat, rowItem, colCat, colItem, others, sectionClassMap)).join('')).join('')}</tr>`;
   }).join('')).join('');
   return `<div class="continuous-grid"><table><thead>${headerGroups}${headers}</thead><tbody>${rows}</tbody></table></div>`;
 }
-function gridCell(rowCat, rowItem, colCat, colItem, others){
-  const rowOtherIndex = others.findIndex(c => c.key === rowCat.key);
-  const colOtherIndex = others.findIndex(c => c.key === colCat.key);
-  const active = rowCat.key !== colCat.key && (rowCat.key === 'bouquets' || colCat.key === 'characters' || colOtherIndex > rowOtherIndex);
-  if(!active) return '<td class="blank-cell" aria-hidden="true"></td>';
-  return `<td class="cell" tabindex="0" role="button" data-a="${rowItem.id}" data-b="${colItem.id}"></td>`;
+function gridCell(rowCat, rowItem, colCat, colItem, others, sectionClassMap){
+  if(!isActiveGridPair(rowCat, colCat, others)) return '<td class="blank-cell" aria-hidden="true"></td>';
+  const sectionClass = sectionClassMap.get(sectionKey(rowCat, colCat)) || 'section-white';
+  return `<td class="cell section-cell ${sectionClass}" tabindex="0" role="button" data-a="${rowItem.id}" data-b="${colItem.id}"></td>`;
 }
 
 function findItem(id){ return state.puzzle.cats.flatMap(c=>c.items).find(i=>i.id===id); }
@@ -286,7 +316,24 @@ function celebrate(){
   const box=document.getElementById('celebration'); box.innerHTML = `<h2>🦋 Sparkly deliveries complete! ✨</h2><ul>${rows}</ul><p>Kitty tied every bouquet with care, and the shoppe glowed with happy blooms.</p>`; box.classList.remove('hidden'); setStatus('Puzzle complete!');
 }
 function setStatus(msg){ document.getElementById('status').textContent = msg; }
+
+function setupKitty(){
+  const kitty = document.getElementById('kitty-runner');
+  kitty.innerHTML = emojiMarkup('🐱');
+  const moveKitty = event => {
+    if(!event.isPrimary && event.pointerType) return;
+    const x = Math.max(22, Math.min(window.innerWidth - 22, event.clientX));
+    const y = Math.max(22, Math.min(window.innerHeight - 22, event.clientY));
+    kitty.classList.add('running');
+    kitty.style.left = `${x}px`;
+    kitty.style.top = `${y}px`;
+    window.clearTimeout(kitty._settleTimer);
+    kitty._settleTimer = window.setTimeout(() => kitty.classList.remove('running'), 280);
+  };
+  document.addEventListener('pointerdown', moveKitty, {passive:true});
+}
 async function init(){
+  setupKitty();
   seed = await fetch('kitty_flower_shoppe_content_seed.json').then(r => r.json());
   const customerCount = document.getElementById('customer-count');
   const categoryCount = document.getElementById('category-count');
