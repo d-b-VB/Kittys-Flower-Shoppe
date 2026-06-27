@@ -155,8 +155,10 @@ h1 {
 .sparkle { left: calc((var(--i) * 19%) % 98%); top: calc(12% + (var(--i) * 9%) % 78%); animation: sparkle-float 2.8s ease-in-out infinite; animation-delay: calc(var(--i) * -190ms); }
 @keyframes slide-to-order { from { transform: translateX(-45vw) scale(.8); opacity: 0; } 70% { transform: translateX(8px) scale(1.08); opacity: 1; } to { transform: translateX(0) scale(1); opacity: 1; } }
 @keyframes joyful-bounce { 0% { transform: translateY(16px) scale(.96); opacity: 0; } 60% { transform: translateY(-5px) scale(1.03); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
-@keyframes butterfly-lilt { 0% { transform: translateY(40px) translateX(0) rotate(-8deg); } 50% { transform: translateY(-120px) translateX(28px) rotate(10deg); } 100% { transform: translateY(40px) translateX(0) rotate(-8deg); } }
+@keyframes butterfly-lilt { 0% { transform: translate(0, 42px) rotate(calc(var(--spin) * -0.5)); } 25% { transform: translate(var(--dx), calc(-42px + var(--dy))) rotate(var(--spin)); } 50% { transform: translate(calc(var(--dx) * -0.6), calc(-122px - var(--dy))) rotate(calc(var(--spin) * -0.8)); } 75% { transform: translate(calc(var(--dx) * .7), calc(-36px + var(--dy))) rotate(calc(var(--spin) * .6)); } 100% { transform: translate(0, 42px) rotate(calc(var(--spin) * -0.5)); } }
 @keyframes sparkle-float { 0%,100% { transform: translateY(16px) scale(.75); opacity: .25; } 50% { transform: translateY(-20px) scale(1.15); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .victory-order, .victory-character, .victory-target, .butterfly, .sparkle { animation: none; }
 }
+.continuous-grid .section-purple.x { background: #dec2ff; }
+.continuous-grid .section-purple.yes { background: linear-gradient(135deg, #c9f8d9, #dec2ff 78%); }

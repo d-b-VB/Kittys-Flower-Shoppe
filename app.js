@@ -343,7 +343,7 @@ function renderGrid(){
   document.getElementById('grid-board').innerHTML = continuousGrid(state.puzzle.cats);
   document.querySelectorAll('.cell').forEach(cell => {
     const a = findItem(cell.dataset.a), b = findItem(cell.dataset.b);
-    const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.className = `cell ${val}`; cell.setAttribute('aria-label', `${itemText(a)} and ${itemText(b)}: ${val || 'blank'}`); };
+    const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.classList.toggle('x', val === 'x'); cell.classList.toggle('yes', val === 'yes'); cell.setAttribute('aria-label', `${itemText(a)} and ${itemText(b)}: ${val || 'blank'}`); };
     sync(getMark(a,b));
     cell.addEventListener('click', () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); maybeCelebrate(); });
     cell.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); cell.click(); } });
@@ -436,7 +436,7 @@ function check(){
 function reveal(){ state.puzzle.characters.forEach(ch => state.puzzle.cats.slice(1).forEach(cat => setMark(ch, state.puzzle.solution[ch.id][cat.key], 'yes'))); autoFill(); celebrate(); }
 function celebrate(){
   state.completed = true;
-  const butterflies = Array.from({length: 8}, (_, i) => `<span class="butterfly" style="--i:${i}">${emojiMarkup('🦋')}</span>`).join('');
+  const butterflies = Array.from({length: 8}, (_, i) => `<span class="butterfly" style="--i:${i};--dx:${(i % 4 - 1.5) * 34}px;--dy:${(i % 3 - 1) * 24}px;--spin:${i % 2 ? 16 : -16}deg">${emojiMarkup('🦋')}</span>`).join('');
   const sparkles = Array.from({length: 14}, (_, i) => `<span class="sparkle" style="--i:${i}">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
   const rows = state.puzzle.characters.map((ch, index) => {
     const targets = state.puzzle.cats.slice(1).map(cat => `<span class="victory-target">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
