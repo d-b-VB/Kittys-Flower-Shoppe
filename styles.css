@@ -136,3 +136,27 @@ th { background: #faf8ff; font-size: .82rem; padding: .25rem; }
 .continuous-grid .section-purple.x { background: #dec2ff; }
 .continuous-grid tbody tr:first-child .section-cell { border-top: 2px solid #cbb5e9; }
 .continuous-grid .section-cell + .section-cell { border-left-color: #d8c8ef; }
+h1 {
+  font-family: "Snell Roundhand", "Bradley Hand", "Comic Sans MS", cursive;
+  color: #7d2de2;
+  text-shadow: 0 3px 0 #ffffff, 0 8px 18px #9933ff22;
+}
+.color-dot { display: inline-block; width: .95em; height: .95em; border-radius: 999px; background: var(--dot); border: 1px solid #8c7c9e55; vertical-align: -.12em; margin-inline: .12em; box-shadow: inset 0 1px 2px #ffffffaa; }
+.color-dot[style*="ffffff"] { border-color: #b9adc7; }
+.victory-stage { position: relative; overflow: hidden; min-height: 260px; }
+.victory-stage h2 { position: relative; z-index: 1; color: #7d2de2; }
+.victory-stage ul { position: relative; z-index: 1; display: grid; gap: .65rem; padding: 0; list-style: none; }
+.victory-order { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; padding: .55rem; border-radius: 18px; background: #ffffffcc; animation: joyful-bounce 900ms ease both; animation-delay: calc(var(--i) * 130ms); }
+.victory-character { display: inline-flex; align-items: center; gap: .2rem; animation: slide-to-order 900ms cubic-bezier(.2, 1.2, .2, 1) both; animation-delay: calc(var(--i) * 130ms); font-weight: 900; }
+.victory-targets { display: inline-flex; flex-wrap: wrap; gap: .3rem; }
+.victory-target { display: inline-flex; align-items: center; gap: .15rem; padding: .18rem .4rem; border-radius: 999px; background: #f0e5ff; animation: joyful-bounce 900ms ease both; animation-delay: calc(180ms + var(--i) * 130ms); }
+.butterfly, .sparkle { position: absolute; z-index: 0; pointer-events: none; opacity: .9; }
+.butterfly { left: calc((var(--i) * 13%) % 95%); top: 72%; animation: butterfly-lilt 4.2s ease-in-out infinite; animation-delay: calc(var(--i) * -420ms); }
+.sparkle { left: calc((var(--i) * 19%) % 98%); top: calc(12% + (var(--i) * 9%) % 78%); animation: sparkle-float 2.8s ease-in-out infinite; animation-delay: calc(var(--i) * -190ms); }
+@keyframes slide-to-order { from { transform: translateX(-45vw) scale(.8); opacity: 0; } 70% { transform: translateX(8px) scale(1.08); opacity: 1; } to { transform: translateX(0) scale(1); opacity: 1; } }
+@keyframes joyful-bounce { 0% { transform: translateY(16px) scale(.96); opacity: 0; } 60% { transform: translateY(-5px) scale(1.03); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes butterfly-lilt { 0% { transform: translateY(40px) translateX(0) rotate(-8deg); } 50% { transform: translateY(-120px) translateX(28px) rotate(10deg); } 100% { transform: translateY(40px) translateX(0) rotate(-8deg); } }
+@keyframes sparkle-float { 0%,100% { transform: translateY(16px) scale(.75); opacity: .25; } 50% { transform: translateY(-20px) scale(1.15); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .victory-order, .victory-character, .victory-target, .butterfly, .sparkle { animation: none; }
+}

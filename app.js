@@ -1,5 +1,5 @@
 let seed;
-const state = { puzzle: null, marks: new Map(), dragging: false, clueIndex: 0 };
+const state = { puzzle: null, marks: new Map(), dragging: false, clueIndex: 0, completed: false };
 const categoryLabels = {characters:'Customers', bouquets:'Flowers', locations:'Places', treats:'Treats', seafoodDishes:'Seafood', generalFoods:'Foods', drinks:'Drinks', ribbons:'Ribbons', occasions:'Occasions', feelings:'Feelings', deliveryTimes:'Delivery times'};
 const actions = {bouquets:'ordered', treats:'ordered', seafoodDishes:'ordered', generalFoods:'ordered', drinks:'ordered', ribbons:'chose the', occasions:'sent flowers for', feelings:'feels', deliveryTimes:'scheduled', locations:'visits'};
 const negativeActions = {bouquets:'did not order', treats:'did not order', seafoodDishes:'did not order', generalFoods:'did not order', drinks:'did not order', ribbons:'did not choose', occasions:'did not send flowers for', feelings:'does not feel', deliveryTimes:'did not schedule', locations:'does not visit'};
@@ -42,13 +42,17 @@ function stockCustomers(roster, count){
 const itemText = item => `${item.emoji ? item.emoji + ' ' : ''}${item.name || item}`;
 const emojiCode = emoji => [...emoji].filter(ch => ch !== '\ufe0f').map(ch => ch.codePointAt(0).toString(16)).join('_');
 const emojiMarkup = emoji => String(emoji || '').split(/\s+/).filter(Boolean).map(part => `<img class="noto-emoji" src="https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u${emojiCode(part)}.png" alt="${part}" loading="lazy" decoding="async">`).join('');
-const itemName = item => `${item.emoji ? emojiMarkup(item.emoji) + ' ' : ''}${item.name || item}`;
+const displayEmoji = item => item.category === 'characters' ? firstEmoji(item) : item.emoji;
+const itemName = item => `${item.emoji ? emojiMarkup(displayEmoji(item)) + ' ' : ''}${item.name || item}`;
 const factEmoji = emoji => emojiMarkup(emoji);
-const flowerEmojiColors = {rose:['red','green'], tulip:['pink','green'], daisy:['white','yellow'], sunflower:['yellow','brown','green'], hyacinth:['purple','green'], hibiscus:['pink','yellow','green'], lotus:['pink','green'], marigold:['orange','yellow']};
+const flowerEmojiColors = {rose:['red'], tulip:['pink'], daisy:['white','yellow'], sunflower:['yellow','brown'], hyacinth:['purple'], hibiscus:['pink','yellow'], lotus:['pink'], marigold:['orange','yellow']};
 const categoryEmoji = {characters:'🐱', bouquets:'💐', locations:'📍', treats:'🍬', seafoodDishes:'🍣', generalFoods:'🍽️', drinks:'🧃', ribbons:'🎀', occasions:'🎉', feelings:'😊', deliveryTimes:'🕒'};
 const firstEmoji = item => String(item.emoji || '').split(/\s+/).filter(Boolean)[0] || '❔';
 const gridLabel = item => emojiMarkup(firstEmoji(item));
 const categoryGridLabel = key => emojiMarkup(categoryEmoji[key] || '🏷️');
+const colorHex = {red:'#f87171', pink:'#f9a8d4', white:'#ffffff', yellow:'#fde047', brown:'#92400e', purple:'#c084fc', orange:'#fb923c'};
+const catSafetyLabel = value => ({okay:'Safe for cats', PPE:'Not safe for cats'}[value] || value);
+const colorDots = values => values.map(color => `<span class="color-dot" style="--dot:${colorHex[color] || color}" title="${color}"></span>`).join('');
 
 function flag(country){
   const map = {Argentina:'AR', Australia:'AU', Bahamas:'BS', Brazil:'BR', Canada:'CA', China:'CN', 'Costa Rica':'CR', Denmark:'DK', Finland:'FI', France:'FR', Germany:'DE', Greece:'GR', Iceland:'IS', India:'IN', Indonesia:'ID', Ireland:'IE', Japan:'JP', Kenya:'KE', Mexico:'MX', Mongolia:'MN', Morocco:'MA', Nepal:'NP', 'New Zealand':'NZ', Peru:'PE', Rwanda:'RW', Scotland:'GB', Slovenia:'SI', 'South Africa':'ZA', Spain:'ES', Switzerland:'CH', Syria:'SY', Tanzania:'TZ', Thailand:'TH', 'Türkiye':'TR', Uganda:'UG', 'United Kingdom':'GB', 'United States':'US', Wales:'GB'};
@@ -297,7 +301,7 @@ function key(a,b){ return [a.id,b.id].sort().join('|'); }
 function setMark(a,b,val){ state.marks.set(key(a,b), val); }
 function getMark(a,b){ return state.marks.get(key(a,b)) || ''; }
 function isCorrectPair(a,b){ return paired(state.puzzle,a,b); }
-function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); document.getElementById('celebration').classList.add('hidden'); }
+function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); if(!state.completed) document.getElementById('celebration').classList.add('hidden'); }
 function renderCards(){
   document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div>${describeCustomer(c).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('');
 }
@@ -319,7 +323,10 @@ function describeItem(item, cat){
   const baseAttrs = cat.key === 'bouquets' ? ['colors','scent','catSafety','pricePerStem'] : cat.key === 'locations' ? ['inside','wetness','noise','light','temperature','elevation','distance','tags'] : [];
   const clueAttrs = [...(state.puzzle.usedAttributes.get(cat.key) || [])];
   return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => item[attr] !== undefined).map(attr => {
-    const value = valuesFor(item, attr).join(', ');
+    const rawValues = valuesFor(item, attr);
+    const value = rawValues.join(', ');
+    if(attr === 'colors') return `colors: ${colorDots(rawValues)}`;
+    if(attr === 'catSafety') return `${factEmoji(attrEmoji[attr])} ${catSafetyLabel(item[attr])}`;
     return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
   });
 }
@@ -338,10 +345,10 @@ function renderGrid(){
     const a = findItem(cell.dataset.a), b = findItem(cell.dataset.b);
     const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.className = `cell ${val}`; cell.setAttribute('aria-label', `${itemText(a)} and ${itemText(b)}: ${val || 'blank'}`); };
     sync(getMark(a,b));
-    cell.addEventListener('click', () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); });
+    cell.addEventListener('click', () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); maybeCelebrate(); });
     cell.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); cell.click(); } });
     cell.addEventListener('pointerdown', e => { state.dragging = true; cell.setPointerCapture(e.pointerId); });
-    cell.addEventListener('pointerenter', () => { if(state.dragging && !getMark(a,b)){ setMark(a,b,'x'); sync('x'); } });
+    cell.addEventListener('pointerenter', () => { if(state.dragging && !getMark(a,b)){ setMark(a,b,'x'); sync('x'); maybeCelebrate(); } });
     cell.addEventListener('pointerup', () => state.dragging = false);
   });
 }
@@ -366,7 +373,7 @@ function continuousGrid(cats){
   const chars = cats.find(c=>c.key==='characters');
   const flowers = cats.find(c=>c.key==='bouquets');
   const others = cats.filter(c=>!['characters','bouquets'].includes(c.key));
-  const colCats = [chars, ...others];
+  const colCats = [chars, ...others.slice().reverse()];
   const rowCats = [flowers, ...others];
   const sectionClassMap = sectionClasses(rowCats, colCats, others);
   const headerGroups = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => `<th class="grouphead" colspan="${cat.items.length}" aria-label="${cat.label}">${categoryGridLabel(cat.key)}</th>`).join('')}</tr>`;
@@ -378,12 +385,37 @@ function continuousGrid(cats){
   return `<div class="continuous-grid"><table><thead>${headerGroups}${headers}</thead><tbody>${rows}</tbody></table></div>`;
 }
 function gridCell(rowCat, rowItem, colCat, colItem, others, sectionClassMap){
-  if(!isActiveGridPair(rowCat, colCat, others)) return '<td class="blank-cell" aria-hidden="true"></td>';
+  if(!isActiveGridPair(rowCat, colCat, others)) return '';
   const sectionClass = sectionClassMap.get(sectionKey(rowCat, colCat)) || 'section-white';
   return `<td class="cell section-cell ${sectionClass}" tabindex="0" role="button" data-a="${rowItem.id}" data-b="${colItem.id}"></td>`;
 }
 
 function findItem(id){ return state.puzzle.cats.flatMap(c=>c.items).find(i=>i.id===id); }
+
+function activeGridItemPairs(){
+  const chars = state.puzzle.cats.find(c=>c.key==='characters');
+  const flowers = state.puzzle.cats.find(c=>c.key==='bouquets');
+  const others = state.puzzle.cats.filter(c=>!['characters','bouquets'].includes(c.key));
+  const colCats = [chars, ...others.slice().reverse()];
+  const rowCats = [flowers, ...others];
+  return rowCats.flatMap(rowCat => rowCat.items.flatMap(rowItem => colCats.flatMap(colCat => {
+    if(!isActiveGridPair(rowCat, colCat, others)) return [];
+    return colCat.items.map(colItem => [rowItem, colItem]);
+  })));
+}
+function completionState(){
+  const pairs = activeGridItemPairs();
+  const hasWrongCheck = pairs.some(([a,b]) => getMark(a,b) === 'yes' && !isCorrectPair(a,b));
+  if(hasWrongCheck) return {allChecks:false, filled:false};
+  const allChecks = pairs.every(([a,b]) => !isCorrectPair(a,b) || getMark(a,b) === 'yes');
+  const filled = pairs.every(([a,b]) => getMark(a,b) === (isCorrectPair(a,b) ? 'yes' : 'x'));
+  return {allChecks, filled};
+}
+function maybeCelebrate(){
+  if(state.completed) return;
+  const done = completionState();
+  if(done.allChecks || done.filled) celebrate();
+}
 function autoFill(){
   const yesPairs = [...state.marks.entries()].filter(([,v])=>v==='yes').map(([k])=>k.split('|'));
   yesPairs.forEach(([id1,id2]) => {
@@ -393,7 +425,7 @@ function autoFill(){
       if(i.category===b.category && i.id!==b.id && a.category!==b.category) setMark(a,i,'x');
     }));
   });
-  renderGrid(); setStatus('Auto-fill marked Xs in rows and columns with a ✓.');
+  renderGrid(); setStatus('Auto-fill marked Xs in rows and columns with a ✓.'); maybeCelebrate();
 }
 function check(){
   const wrong = [...state.marks.entries()].some(([k,v]) => v==='yes' && !isCorrectPair(...k.split('|').map(findItem)));
@@ -403,9 +435,19 @@ function check(){
 }
 function reveal(){ state.puzzle.characters.forEach(ch => state.puzzle.cats.slice(1).forEach(cat => setMark(ch, state.puzzle.solution[ch.id][cat.key], 'yes'))); autoFill(); celebrate(); }
 function celebrate(){
-  const rows = state.puzzle.characters.map(ch => `<li>${itemName(ch)} ${state.puzzle.cats.slice(1).map(cat => `${verb(cat.key)} ${itemName(state.puzzle.solution[ch.id][cat.key])}`).join(', ')}.</li>`).join('');
-  const box=document.getElementById('celebration'); box.innerHTML = `<h2>🦋 Sparkly deliveries complete! ✨</h2><ul>${rows}</ul><p>Kitty tied every bouquet with care, and the shoppe glowed with happy blooms.</p>`; box.classList.remove('hidden'); setStatus('Puzzle complete!');
+  state.completed = true;
+  const butterflies = Array.from({length: 8}, (_, i) => `<span class="butterfly" style="--i:${i}">${emojiMarkup('🦋')}</span>`).join('');
+  const sparkles = Array.from({length: 14}, (_, i) => `<span class="sparkle" style="--i:${i}">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
+  const rows = state.puzzle.characters.map((ch, index) => {
+    const targets = state.puzzle.cats.slice(1).map(cat => `<span class="victory-target">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
+    return `<li class="victory-order" style="--i:${index}"><span class="victory-character">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span></li>`;
+  }).join('');
+  const box=document.getElementById('celebration');
+  box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><p>Everyone bounces together with bouquets, butterflies, and sparkles.</p></div>`;
+  box.classList.remove('hidden');
+  setStatus('Puzzle complete!');
 }
+
 function setStatus(msg){ document.getElementById('status').textContent = msg; }
 
 function setupKitty(){
@@ -419,8 +461,8 @@ function setupKitty(){
   const step = () => {
     const dx = motion.tx - motion.x;
     const dy = motion.ty - motion.y;
-    motion.vx = (motion.vx + dx * 0.045) * 0.86;
-    motion.vy = (motion.vy + dy * 0.045) * 0.86;
+    motion.vx = (motion.vx + dx * 0.022) * 0.88;
+    motion.vy = (motion.vy + dy * 0.022) * 0.88;
     motion.x += motion.vx;
     motion.y += motion.vy;
     place();
@@ -446,7 +488,7 @@ async function init(){
   seed = await fetch('kitty_flower_shoppe_content_seed.json').then(r => r.json());
   const customerCount = document.getElementById('customer-count');
   const categoryCount = document.getElementById('category-count');
-  document.getElementById('new-game-form').addEventListener('submit', e => { e.preventDefault(); state.marks.clear(); state.clueIndex = 0; state.puzzle = newPuzzle(+customerCount.value, +categoryCount.value); render(); setStatus(`New puzzle ready with ${state.puzzle.clues.length} minimal clues.`); });
+  document.getElementById('new-game-form').addEventListener('submit', e => { e.preventDefault(); state.marks.clear(); state.clueIndex = 0; state.completed = false; state.puzzle = newPuzzle(+customerCount.value, +categoryCount.value); render(); setStatus(`New puzzle ready with ${state.puzzle.clues.length} minimal clues.`); });
   document.getElementById('auto-fill').addEventListener('click', autoFill);
   document.getElementById('check').addEventListener('click', check);
   document.getElementById('reveal').addEventListener('click', reveal);
