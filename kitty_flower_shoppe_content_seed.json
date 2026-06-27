@@ -1,0 +1,1889 @@
+{
+  "project": "Kitty's Flower Shoppe",
+  "version": "V1 stateless prototype",
+  "characters": [
+    {
+      "id": "turtle",
+      "emoji": "🐢",
+      "name": "Turtle",
+      "tier": 4,
+      "country": "Greece",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 1 in",
+      "heightInches": 13,
+      "ageDisplay": "5 years",
+      "ageMonths": 60,
+      "texture": "shell, scaly",
+      "likes": [
+        "books",
+        "grapes"
+      ],
+      "dislikesOrFears": [
+        "spiders",
+        "wind"
+      ],
+      "hobby": "gardening"
+    },
+    {
+      "id": "ducky",
+      "emoji": "🐥",
+      "name": "Ducky",
+      "tier": 4,
+      "country": "Canada",
+      "continent": "North America",
+      "heightDisplay": "1 ft 11 in",
+      "heightInches": 23,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "feathered",
+      "likes": [
+        "grapes",
+        "songs"
+      ],
+      "dislikesOrFears": [
+        "spiders",
+        "loud bells"
+      ],
+      "hobby": "feather collecting"
+    },
+    {
+      "id": "bunny",
+      "emoji": "🐇",
+      "name": "Bunny",
+      "tier": 4,
+      "country": "Ireland",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 1 in",
+      "heightInches": 13,
+      "ageDisplay": "6 months",
+      "ageMonths": 6,
+      "texture": "furry",
+      "likes": [
+        "rain",
+        "tea"
+      ],
+      "dislikesOrFears": [
+        "loud bells",
+        "brooms"
+      ],
+      "hobby": "sewing"
+    },
+    {
+      "id": "hedgehog",
+      "emoji": "🦔",
+      "name": "Hedgehog",
+      "tier": 4,
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "heightDisplay": "8 in",
+      "heightInches": 8,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "spiny",
+      "likes": [
+        "buttons",
+        "mushrooms"
+      ],
+      "dislikesOrFears": [
+        "wind",
+        "bubbles"
+      ],
+      "hobby": "painting"
+    },
+    {
+      "id": "mouse",
+      "emoji": "🐭",
+      "name": "Mouse",
+      "tier": 8,
+      "country": "Japan",
+      "continent": "Asia",
+      "heightDisplay": "4 in",
+      "heightInches": 4,
+      "ageDisplay": "2 months",
+      "ageMonths": 2,
+      "texture": "furry",
+      "likes": [
+        "buttons",
+        "cheese"
+      ],
+      "dislikesOrFears": [
+        "brooms",
+        "deep water"
+      ],
+      "hobby": "sewing"
+    },
+    {
+      "id": "frog",
+      "emoji": "🐸",
+      "name": "Frog",
+      "tier": 8,
+      "country": "Costa Rica",
+      "continent": "North America",
+      "heightDisplay": "4 in",
+      "heightInches": 4,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "slimy",
+      "likes": [
+        "rain",
+        "songs"
+      ],
+      "dislikesOrFears": [
+        "salt",
+        "hot sun"
+      ],
+      "hobby": "singing"
+    },
+    {
+      "id": "squirrel",
+      "emoji": "🐿️",
+      "name": "Squirrel",
+      "tier": 8,
+      "country": "United States",
+      "continent": "North America",
+      "heightDisplay": "10 in",
+      "heightInches": 10,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "fluffy",
+      "likes": [
+        "grapes",
+        "autumn"
+      ],
+      "dislikesOrFears": [
+        "deep water",
+        "bells"
+      ],
+      "hobby": "stone collecting"
+    },
+    {
+      "id": "sheep",
+      "emoji": "🐑",
+      "name": "Sheep",
+      "tier": 8,
+      "country": "New Zealand",
+      "continent": "Oceania",
+      "heightDisplay": "2 ft 5 in",
+      "heightInches": 29,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "woolly",
+      "likes": [
+        "yarn",
+        "clouds"
+      ],
+      "dislikesOrFears": [
+        "brooms",
+        "prickles"
+      ],
+      "hobby": "sewing"
+    },
+    {
+      "id": "fox",
+      "emoji": "🦊",
+      "name": "Fox",
+      "tier": 8,
+      "country": "Finland",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 4 in",
+      "heightInches": 16,
+      "ageDisplay": "10 months",
+      "ageMonths": 10,
+      "texture": "furry",
+      "likes": [
+        "tea",
+        "moonlight"
+      ],
+      "dislikesOrFears": [
+        "baths",
+        "bells"
+      ],
+      "hobby": "mapmaking"
+    },
+    {
+      "id": "owl",
+      "emoji": "🦉",
+      "name": "Owl",
+      "tier": 8,
+      "country": "Greece",
+      "continent": "Europe",
+      "heightDisplay": "2 ft 0 in",
+      "heightInches": 24,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "feathered",
+      "likes": [
+        "books",
+        "moonlight"
+      ],
+      "dislikesOrFears": [
+        "bright mornings",
+        "balloons"
+      ],
+      "hobby": "poetry"
+    },
+    {
+      "id": "bee",
+      "emoji": "🐝",
+      "name": "Bee",
+      "tier": 8,
+      "country": "Slovenia",
+      "continent": "Europe",
+      "heightDisplay": "1 in",
+      "heightInches": 1,
+      "ageDisplay": "1 month",
+      "ageMonths": 1,
+      "texture": "fuzzy",
+      "likes": [
+        "flowers",
+        "honey"
+      ],
+      "dislikesOrFears": [
+        "rain",
+        "cold"
+      ],
+      "hobby": "delivering notes"
+    },
+    {
+      "id": "snail",
+      "emoji": "🐌",
+      "name": "Snail",
+      "tier": 8,
+      "country": "France",
+      "continent": "Europe",
+      "heightDisplay": "2 in",
+      "heightInches": 2,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "slimy, shell",
+      "likes": [
+        "tea",
+        "leaves"
+      ],
+      "dislikesOrFears": [
+        "salt",
+        "wind"
+      ],
+      "hobby": "tiny photos"
+    },
+    {
+      "id": "bear",
+      "emoji": "🐻",
+      "name": "Bear",
+      "tier": 16,
+      "country": "Finland",
+      "continent": "Europe",
+      "heightDisplay": "4 ft 0 in",
+      "heightInches": 48,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "furry",
+      "likes": [
+        "honey",
+        "naps"
+      ],
+      "dislikesOrFears": [
+        "alarms",
+        "brooms"
+      ],
+      "hobby": "baking"
+    },
+    {
+      "id": "pig",
+      "emoji": "🐷",
+      "name": "Pig",
+      "tier": 16,
+      "country": "China",
+      "continent": "Asia",
+      "heightDisplay": "2 ft 3 in",
+      "heightInches": 27,
+      "ageDisplay": "6 months",
+      "ageMonths": 6,
+      "texture": "smooth",
+      "likes": [
+        "grapes",
+        "berries"
+      ],
+      "dislikesOrFears": [
+        "mirrors",
+        "cold puddles"
+      ],
+      "hobby": "music"
+    },
+    {
+      "id": "goat",
+      "emoji": "🐐",
+      "name": "Goat",
+      "tier": 16,
+      "country": "Switzerland",
+      "continent": "Europe",
+      "heightDisplay": "2 ft 6 in",
+      "heightInches": 30,
+      "ageDisplay": "7 months",
+      "ageMonths": 7,
+      "texture": "furry",
+      "likes": [
+        "tea",
+        "bread"
+      ],
+      "dislikesOrFears": [
+        "deep water",
+        "knots"
+      ],
+      "hobby": "gardening"
+    },
+    {
+      "id": "cow",
+      "emoji": "🐄",
+      "name": "Cow",
+      "tier": 16,
+      "country": "India",
+      "continent": "Asia",
+      "heightDisplay": "4 ft 8 in",
+      "heightInches": 56,
+      "ageDisplay": "15 months",
+      "ageMonths": 15,
+      "texture": "smooth",
+      "likes": [
+        "flowers",
+        "fields"
+      ],
+      "dislikesOrFears": [
+        "bees",
+        "loud bells"
+      ],
+      "hobby": "painting"
+    },
+    {
+      "id": "deer",
+      "emoji": "🦌",
+      "name": "Deer",
+      "tier": 16,
+      "country": "Japan",
+      "continent": "Asia",
+      "heightDisplay": "3 ft 3 in",
+      "heightInches": 39,
+      "ageDisplay": "18 months",
+      "ageMonths": 18,
+      "texture": "furry",
+      "likes": [
+        "moonlight",
+        "leaves"
+      ],
+      "dislikesOrFears": [
+        "shouting",
+        "brooms"
+      ],
+      "hobby": "flower pressing"
+    },
+    {
+      "id": "raccoon",
+      "emoji": "🦝",
+      "name": "Raccoon",
+      "tier": 16,
+      "country": "United States",
+      "continent": "North America",
+      "heightDisplay": "1 ft 0 in",
+      "heightInches": 12,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "furry",
+      "likes": [
+        "buttons",
+        "shiny things"
+      ],
+      "dislikesOrFears": [
+        "baths",
+        "deep water"
+      ],
+      "hobby": "key collecting"
+    },
+    {
+      "id": "beaver",
+      "emoji": "🦫",
+      "name": "Beaver",
+      "tier": 16,
+      "country": "Canada",
+      "continent": "North America",
+      "heightDisplay": "1 ft 0 in",
+      "heightInches": 12,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "rain",
+        "wood"
+      ],
+      "dislikesOrFears": [
+        "dry weather",
+        "cold"
+      ],
+      "hobby": "building"
+    },
+    {
+      "id": "badger",
+      "emoji": "🦡",
+      "name": "Badger",
+      "tier": 16,
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 0 in",
+      "heightInches": 12,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "furry",
+      "likes": [
+        "mushrooms",
+        "burrows"
+      ],
+      "dislikesOrFears": [
+        "perfume",
+        "balloons"
+      ],
+      "hobby": "puzzles"
+    },
+    {
+      "id": "koala",
+      "emoji": "🐨",
+      "name": "Koala",
+      "tier": 16,
+      "country": "Australia",
+      "continent": "Oceania",
+      "heightDisplay": "2 ft 3 in",
+      "heightInches": 27,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "books",
+        "naps"
+      ],
+      "dislikesOrFears": [
+        "bells",
+        "rain"
+      ],
+      "hobby": "crocheting"
+    },
+    {
+      "id": "panda",
+      "emoji": "🐼",
+      "name": "Panda",
+      "tier": 16,
+      "country": "China",
+      "continent": "Asia",
+      "heightDisplay": "2 ft 6 in",
+      "heightInches": 30,
+      "ageDisplay": "5 years",
+      "ageMonths": 60,
+      "texture": "furry",
+      "likes": [
+        "bamboo",
+        "painting"
+      ],
+      "dislikesOrFears": [
+        "noise",
+        "hard puzzles"
+      ],
+      "hobby": "ink painting"
+    },
+    {
+      "id": "penguin",
+      "emoji": "🐧",
+      "name": "Penguin",
+      "tier": 16,
+      "country": "Argentina",
+      "continent": "South America",
+      "heightDisplay": "2 ft 4 in",
+      "heightInches": 28,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "feathered",
+      "likes": [
+        "songs",
+        "snow"
+      ],
+      "dislikesOrFears": [
+        "spiders",
+        "heat"
+      ],
+      "hobby": "scarf collecting"
+    },
+    {
+      "id": "birdy",
+      "emoji": "🐦",
+      "name": "Birdy",
+      "tier": 16,
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "heightDisplay": "5 in",
+      "heightInches": 5,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "feathered",
+      "likes": [
+        "flowers",
+        "mornings"
+      ],
+      "dislikesOrFears": [
+        "thunder",
+        "mirrors"
+      ],
+      "hobby": "whistling"
+    },
+    {
+      "id": "dog",
+      "emoji": "🐶",
+      "name": "Dog",
+      "tier": 16,
+      "country": "Mexico",
+      "continent": "North America",
+      "heightDisplay": "1 ft 6 in",
+      "heightInches": 18,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "furry",
+      "likes": [
+        "songs",
+        "balls"
+      ],
+      "dislikesOrFears": [
+        "thunder",
+        "baths"
+      ],
+      "hobby": "stick collecting"
+    },
+    {
+      "id": "hamster",
+      "emoji": "🐹",
+      "name": "Hamster",
+      "tier": 16,
+      "country": "Syria",
+      "continent": "Asia",
+      "heightDisplay": "3 in",
+      "heightInches": 3,
+      "ageDisplay": "2 months",
+      "ageMonths": 2,
+      "texture": "fluffy",
+      "likes": [
+        "seeds",
+        "naps"
+      ],
+      "dislikesOrFears": [
+        "spiders",
+        "wind"
+      ],
+      "hobby": "baking"
+    },
+    {
+      "id": "horse",
+      "emoji": "🐎",
+      "name": "Horse",
+      "tier": 16,
+      "country": "Mongolia",
+      "continent": "Asia",
+      "heightDisplay": "5 ft 0 in",
+      "heightInches": 60,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "grapes",
+        "fields"
+      ],
+      "dislikesOrFears": [
+        "bees",
+        "balloons"
+      ],
+      "hobby": "music"
+    },
+    {
+      "id": "donkey",
+      "emoji": "🫏",
+      "name": "Donkey",
+      "tier": 16,
+      "country": "Spain",
+      "continent": "Europe",
+      "heightDisplay": "4 ft 0 in",
+      "heightInches": 48,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "carrots",
+        "tea"
+      ],
+      "dislikesOrFears": [
+        "baths",
+        "mirrors"
+      ],
+      "hobby": "parcel carrying"
+    },
+    {
+      "id": "llama",
+      "emoji": "🦙",
+      "name": "Llama",
+      "tier": 32,
+      "country": "Peru",
+      "continent": "South America",
+      "heightDisplay": "3 ft 7 in",
+      "heightInches": 43,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "woolly",
+      "likes": [
+        "yarn",
+        "mountains"
+      ],
+      "dislikesOrFears": [
+        "balloons",
+        "drizzle"
+      ],
+      "hobby": "weaving"
+    },
+    {
+      "id": "elephant",
+      "emoji": "🐘",
+      "name": "Elephant",
+      "tier": 32,
+      "country": "Thailand",
+      "continent": "Asia",
+      "heightDisplay": "9 ft 0 in",
+      "heightInches": 108,
+      "ageDisplay": "12 years",
+      "ageMonths": 144,
+      "texture": "wrinkly",
+      "likes": [
+        "rain",
+        "fruit"
+      ],
+      "dislikesOrFears": [
+        "mice",
+        "ice"
+      ],
+      "hobby": "music"
+    },
+    {
+      "id": "giraffe",
+      "emoji": "🦒",
+      "name": "Giraffe",
+      "tier": 32,
+      "country": "Tanzania",
+      "continent": "Africa",
+      "heightDisplay": "16 ft 0 in",
+      "heightInches": 192,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "short-furred",
+      "likes": [
+        "flowers",
+        "trees"
+      ],
+      "dislikesOrFears": [
+        "tunnels",
+        "deep water"
+      ],
+      "hobby": "hat collecting"
+    },
+    {
+      "id": "lion",
+      "emoji": "🦁",
+      "name": "Lion",
+      "tier": 32,
+      "country": "Kenya",
+      "continent": "Africa",
+      "heightDisplay": "4 ft 0 in",
+      "heightInches": 48,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "furry mane",
+      "likes": [
+        "sunshine",
+        "songs"
+      ],
+      "dislikesOrFears": [
+        "cold",
+        "cleaning"
+      ],
+      "hobby": "storytelling"
+    },
+    {
+      "id": "tiger",
+      "emoji": "🐯",
+      "name": "Tiger",
+      "tier": 32,
+      "country": "India",
+      "continent": "Asia",
+      "heightDisplay": "3 ft 6 in",
+      "heightInches": 42,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "furry",
+      "likes": [
+        "moonlight",
+        "painting"
+      ],
+      "dislikesOrFears": [
+        "fireworks",
+        "mirrors"
+      ],
+      "hobby": "stripe painting"
+    },
+    {
+      "id": "zebra",
+      "emoji": "🦓",
+      "name": "Zebra",
+      "tier": 32,
+      "country": "South Africa",
+      "continent": "Africa",
+      "heightDisplay": "4 ft 6 in",
+      "heightInches": 54,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "balloons",
+        "crayons"
+      ],
+      "dislikesOrFears": [
+        "matching games",
+        "bubbles"
+      ],
+      "hobby": "piano"
+    },
+    {
+      "id": "rhino",
+      "emoji": "🦏",
+      "name": "Rhino",
+      "tier": 32,
+      "country": "Nepal",
+      "continent": "Asia",
+      "heightDisplay": "5 ft 6 in",
+      "heightInches": 66,
+      "ageDisplay": "5 years",
+      "ageMonths": 60,
+      "texture": "rough skin",
+      "likes": [
+        "leaves",
+        "sweeping"
+      ],
+      "dislikesOrFears": [
+        "balloons",
+        "bells"
+      ],
+      "hobby": "stone carving"
+    },
+    {
+      "id": "hippo",
+      "emoji": "🦛",
+      "name": "Hippo",
+      "tier": 32,
+      "country": "Uganda",
+      "continent": "Africa",
+      "heightDisplay": "4 ft 10 in",
+      "heightInches": 58,
+      "ageDisplay": "5 years",
+      "ageMonths": 60,
+      "texture": "smooth",
+      "likes": [
+        "rain",
+        "watermelon"
+      ],
+      "dislikesOrFears": [
+        "snow",
+        "candles"
+      ],
+      "hobby": "bubble blowing"
+    },
+    {
+      "id": "kangaroo",
+      "emoji": "🦘",
+      "name": "Kangaroo",
+      "tier": 32,
+      "country": "Australia",
+      "continent": "Oceania",
+      "heightDisplay": "5 ft 4 in",
+      "heightInches": 64,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "carrots",
+        "pouches"
+      ],
+      "dislikesOrFears": [
+        "ice",
+        "ladders"
+      ],
+      "hobby": "kite flying"
+    },
+    {
+      "id": "sloth",
+      "emoji": "🦥",
+      "name": "Sloth",
+      "tier": 32,
+      "country": "Costa Rica",
+      "continent": "North America",
+      "heightDisplay": "2 ft 0 in",
+      "heightInches": 24,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "furry",
+      "likes": [
+        "naps",
+        "leaves"
+      ],
+      "dislikesOrFears": [
+        "schedules",
+        "fast songs"
+      ],
+      "hobby": "crocheting"
+    },
+    {
+      "id": "skunk",
+      "emoji": "🦨",
+      "name": "Skunk",
+      "tier": 32,
+      "country": "United States",
+      "continent": "North America",
+      "heightDisplay": "8 in",
+      "heightInches": 8,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "furry",
+      "likes": [
+        "grapes",
+        "moonlight"
+      ],
+      "dislikesOrFears": [
+        "soap",
+        "wind"
+      ],
+      "hobby": "perfume making"
+    },
+    {
+      "id": "bat",
+      "emoji": "🦇",
+      "name": "Bat",
+      "tier": 32,
+      "country": "Mexico",
+      "continent": "North America",
+      "heightDisplay": "4 in",
+      "heightInches": 4,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "furry wings",
+      "likes": [
+        "moonlight",
+        "cherries"
+      ],
+      "dislikesOrFears": [
+        "bells",
+        "sunshine"
+      ],
+      "hobby": "violin"
+    },
+    {
+      "id": "flamingo",
+      "emoji": "🦩",
+      "name": "Flamingo",
+      "tier": 32,
+      "country": "Bahamas",
+      "continent": "North America",
+      "heightDisplay": "4 ft 0 in",
+      "heightInches": 48,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "feathered",
+      "likes": [
+        "flowers",
+        "pink things"
+      ],
+      "dislikesOrFears": [
+        "snow",
+        "wind"
+      ],
+      "hobby": "dancing"
+    },
+    {
+      "id": "parrot",
+      "emoji": "🦜",
+      "name": "Parrot",
+      "tier": 32,
+      "country": "Brazil",
+      "continent": "South America",
+      "heightDisplay": "1 ft 2 in",
+      "heightInches": 14,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "feathered",
+      "likes": [
+        "songs",
+        "colors"
+      ],
+      "dislikesOrFears": [
+        "silence",
+        "rain"
+      ],
+      "hobby": "singing"
+    },
+    {
+      "id": "swan",
+      "emoji": "🦢",
+      "name": "Swan",
+      "tier": 32,
+      "country": "Denmark",
+      "continent": "Europe",
+      "heightDisplay": "4 ft 0 in",
+      "heightInches": 48,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "feathered",
+      "likes": [
+        "tea",
+        "candlelight"
+      ],
+      "dislikesOrFears": [
+        "messes",
+        "wet socks"
+      ],
+      "hobby": "dancing"
+    },
+    {
+      "id": "peacock",
+      "emoji": "🦚",
+      "name": "Peacock",
+      "tier": 32,
+      "country": "India",
+      "continent": "Asia",
+      "heightDisplay": "3 ft 3 in",
+      "heightInches": 39,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "feathered",
+      "likes": [
+        "buttons",
+        "rainbows"
+      ],
+      "dislikesOrFears": [
+        "dust",
+        "baths"
+      ],
+      "hobby": "costume design"
+    },
+    {
+      "id": "chicken",
+      "emoji": "🐔",
+      "name": "Chicken",
+      "tier": 32,
+      "country": "France",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 6 in",
+      "heightInches": 18,
+      "ageDisplay": "6 months",
+      "ageMonths": 6,
+      "texture": "feathered",
+      "likes": [
+        "flowers",
+        "corn"
+      ],
+      "dislikesOrFears": [
+        "darkness",
+        "owls"
+      ],
+      "hobby": "baking"
+    },
+    {
+      "id": "turkey",
+      "emoji": "🦃",
+      "name": "Turkey",
+      "tier": 32,
+      "country": "Türkiye",
+      "continent": "Asia",
+      "heightDisplay": "3 ft 0 in",
+      "heightInches": 36,
+      "ageDisplay": "7 months",
+      "ageMonths": 7,
+      "texture": "feathered",
+      "likes": [
+        "autumn",
+        "songs"
+      ],
+      "dislikesOrFears": [
+        "rain",
+        "mirrors"
+      ],
+      "hobby": "letter writing"
+    },
+    {
+      "id": "eagle",
+      "emoji": "🦅",
+      "name": "Eagle",
+      "tier": 32,
+      "country": "United States",
+      "continent": "North America",
+      "heightDisplay": "3 ft 0 in",
+      "heightInches": 36,
+      "ageDisplay": "4 years",
+      "ageMonths": 48,
+      "texture": "feathered",
+      "likes": [
+        "wind",
+        "mountains"
+      ],
+      "dislikesOrFears": [
+        "balloons",
+        "small rooms"
+      ],
+      "hobby": "map reading"
+    },
+    {
+      "id": "dove",
+      "emoji": "🕊️",
+      "name": "Dove",
+      "tier": 32,
+      "country": "Greece",
+      "continent": "Europe",
+      "heightDisplay": "1 ft 0 in",
+      "heightInches": 12,
+      "ageDisplay": "7 months",
+      "ageMonths": 7,
+      "texture": "feathered",
+      "likes": [
+        "flowers",
+        "peace"
+      ],
+      "dislikesOrFears": [
+        "shouting",
+        "thunder"
+      ],
+      "hobby": "delivering letters"
+    },
+    {
+      "id": "crow",
+      "emoji": "🐦‍⬛",
+      "name": "Crow",
+      "tier": 32,
+      "country": "Japan",
+      "continent": "Asia",
+      "heightDisplay": "1 ft 8 in",
+      "heightInches": 20,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "feathered",
+      "likes": [
+        "buttons",
+        "shiny things"
+      ],
+      "dislikesOrFears": [
+        "baths",
+        "plush toys"
+      ],
+      "hobby": "riddles"
+    },
+    {
+      "id": "monkey",
+      "emoji": "🐒",
+      "name": "Monkey",
+      "tier": 32,
+      "country": "India",
+      "continent": "Asia",
+      "heightDisplay": "2 ft 0 in",
+      "heightInches": 24,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "furry",
+      "likes": [
+        "bananas",
+        "songs"
+      ],
+      "dislikesOrFears": [
+        "waiting",
+        "quiet rooms"
+      ],
+      "hobby": "juggling"
+    },
+    {
+      "id": "orangutan",
+      "emoji": "🦧",
+      "name": "Orangutan",
+      "tier": 32,
+      "country": "Indonesia",
+      "continent": "Asia",
+      "heightDisplay": "4 ft 4 in",
+      "heightInches": 52,
+      "ageDisplay": "8 years",
+      "ageMonths": 96,
+      "texture": "furry",
+      "likes": [
+        "books",
+        "oranges"
+      ],
+      "dislikesOrFears": [
+        "thunder",
+        "cold"
+      ],
+      "hobby": "knitting"
+    },
+    {
+      "id": "gorilla",
+      "emoji": "🦍",
+      "name": "Gorilla",
+      "tier": 32,
+      "country": "Rwanda",
+      "continent": "Africa",
+      "heightDisplay": "5 ft 6 in",
+      "heightInches": 66,
+      "ageDisplay": "10 years",
+      "ageMonths": 120,
+      "texture": "furry",
+      "likes": [
+        "flowers",
+        "drums"
+      ],
+      "dislikesOrFears": [
+        "bees",
+        "balloons"
+      ],
+      "hobby": "gardening"
+    },
+    {
+      "id": "wolf",
+      "emoji": "🐺",
+      "name": "Wolf",
+      "tier": 32,
+      "country": "Canada",
+      "continent": "North America",
+      "heightDisplay": "2 ft 8 in",
+      "heightInches": 32,
+      "ageDisplay": "2 years",
+      "ageMonths": 24,
+      "texture": "furry",
+      "likes": [
+        "tea",
+        "moonlight"
+      ],
+      "dislikesOrFears": [
+        "baths",
+        "mirrors"
+      ],
+      "hobby": "howling songs"
+    },
+    {
+      "id": "boar",
+      "emoji": "🐗",
+      "name": "Boar",
+      "tier": 32,
+      "country": "Germany",
+      "continent": "Europe",
+      "heightDisplay": "3 ft 0 in",
+      "heightInches": 36,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "bristly",
+      "likes": [
+        "mushrooms",
+        "leaves"
+      ],
+      "dislikesOrFears": [
+        "perfume",
+        "ladders"
+      ],
+      "hobby": "pie making"
+    },
+    {
+      "id": "ox",
+      "emoji": "🐂",
+      "name": "Ox",
+      "tier": 32,
+      "country": "Nepal",
+      "continent": "Asia",
+      "heightDisplay": "5 ft 0 in",
+      "heightInches": 60,
+      "ageDisplay": "18 months",
+      "ageMonths": 18,
+      "texture": "furry",
+      "likes": [
+        "fields",
+        "wood"
+      ],
+      "dislikesOrFears": [
+        "balloons",
+        "cold rain"
+      ],
+      "hobby": "woodworking"
+    },
+    {
+      "id": "ram",
+      "emoji": "🐏",
+      "name": "Ram",
+      "tier": 32,
+      "country": "Iceland",
+      "continent": "Europe",
+      "heightDisplay": "2 ft 6 in",
+      "heightInches": 30,
+      "ageDisplay": "1 year",
+      "ageMonths": 12,
+      "texture": "woolly",
+      "likes": [
+        "yarn",
+        "snow"
+      ],
+      "dislikesOrFears": [
+        "bubbles",
+        "puzzles"
+      ],
+      "hobby": "stone collecting"
+    },
+    {
+      "id": "camel",
+      "emoji": "🐫",
+      "name": "Camel",
+      "tier": 32,
+      "country": "Morocco",
+      "continent": "Africa",
+      "heightDisplay": "6 ft 0 in",
+      "heightInches": 72,
+      "ageDisplay": "3 years",
+      "ageMonths": 36,
+      "texture": "furry",
+      "likes": [
+        "tea",
+        "warmth"
+      ],
+      "dislikesOrFears": [
+        "rain",
+        "snow"
+      ],
+      "hobby": "basket weaving"
+    },
+    {
+      "id": "unicorn",
+      "emoji": "🦄",
+      "name": "Unicorn",
+      "tier": 32,
+      "country": "Scotland",
+      "continent": "Europe",
+      "heightDisplay": "4 ft 8 in",
+      "heightInches": 56,
+      "ageDisplay": "5 years",
+      "ageMonths": 60,
+      "texture": "furry, magical horn",
+      "likes": [
+        "books",
+        "rainbows"
+      ],
+      "dislikesOrFears": [
+        "spiders",
+        "tunnels"
+      ],
+      "hobby": "stargazing"
+    },
+    {
+      "id": "dragon",
+      "emoji": "🐉",
+      "name": "Dragon",
+      "tier": 32,
+      "country": "Wales",
+      "continent": "Europe",
+      "heightDisplay": "7 ft 0 in",
+      "heightInches": 84,
+      "ageDisplay": "8 years",
+      "ageMonths": 96,
+      "texture": "scaly",
+      "likes": [
+        "books",
+        "warm tea"
+      ],
+      "dislikesOrFears": [
+        "ice",
+        "bubbles"
+      ],
+      "hobby": "wood carving"
+    },
+    {
+      "id": "ghost",
+      "emoji": "👻",
+      "name": "Ghost",
+      "tier": 32,
+      "country": "Ireland",
+      "continent": "Europe",
+      "heightDisplay": "3 ft 6 in",
+      "heightInches": 42,
+      "ageDisplay": "100 years",
+      "ageMonths": 1200,
+      "texture": "wispy",
+      "likes": [
+        "moonlight",
+        "candles"
+      ],
+      "dislikesOrFears": [
+        "salt",
+        "sunshine"
+      ],
+      "hobby": "writing letters"
+    }
+  ],
+  "locations": [
+    {
+      "id": "shoppe",
+      "emoji": "🏪",
+      "name": "Flower Shoppe",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "medium",
+      "light": "bright",
+      "temperature": "warm",
+      "elevation": "ground",
+      "distance": "zero",
+      "tags": [
+        "cozy",
+        "fragrant",
+        "private"
+      ]
+    },
+    {
+      "id": "pond",
+      "emoji": "🌊",
+      "name": "Pond",
+      "inside": "outside",
+      "wetness": "wet",
+      "noise": "quiet",
+      "light": "bright",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "watery",
+        "frogs"
+      ]
+    },
+    {
+      "id": "creek",
+      "emoji": "🏞️",
+      "name": "Creek",
+      "inside": "outside",
+      "wetness": "wet",
+      "noise": "medium",
+      "light": "bright",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "watery",
+        "flowing",
+        "pebbly"
+      ]
+    },
+    {
+      "id": "beach",
+      "emoji": "🏖️",
+      "name": "Beach",
+      "inside": "outside",
+      "wetness": "wet",
+      "noise": "lively",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "far",
+      "tags": [
+        "sandy",
+        "windy",
+        "seaside"
+      ]
+    },
+    {
+      "id": "harbor",
+      "emoji": "⚓",
+      "name": "Harbor",
+      "inside": "outside",
+      "wetness": "wet",
+      "noise": "lively",
+      "light": "bright",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "far",
+      "tags": [
+        "boats",
+        "windy",
+        "seaside"
+      ]
+    },
+    {
+      "id": "meadow",
+      "emoji": "🌻",
+      "name": "Meadow",
+      "inside": "outside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "sunny",
+        "open",
+        "floral"
+      ]
+    },
+    {
+      "id": "woods",
+      "emoji": "🌲",
+      "name": "Woods",
+      "inside": "outside",
+      "wetness": "damp",
+      "noise": "quiet",
+      "light": "dim",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "shady",
+        "leafy"
+      ]
+    },
+    {
+      "id": "hilltop",
+      "emoji": "⛰️",
+      "name": "Hilltop",
+      "inside": "outside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "bright",
+      "temperature": "cool",
+      "elevation": "high",
+      "distance": "far",
+      "tags": [
+        "windy",
+        "scenic"
+      ]
+    },
+    {
+      "id": "library",
+      "emoji": "📚",
+      "name": "Library",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "dim",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "books",
+        "peaceful",
+        "public"
+      ]
+    },
+    {
+      "id": "church",
+      "emoji": "⛪",
+      "name": "Church",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "dim",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "formal",
+        "echoing",
+        "public"
+      ]
+    },
+    {
+      "id": "bank",
+      "emoji": "🏦",
+      "name": "Bank",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "medium",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "formal",
+        "secure",
+        "public"
+      ]
+    },
+    {
+      "id": "town_hall",
+      "emoji": "🏛️",
+      "name": "Town Hall",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "lively",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "formal",
+        "public"
+      ]
+    },
+    {
+      "id": "bakery",
+      "emoji": "🥖",
+      "name": "Bakery",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "medium",
+      "light": "bright",
+      "temperature": "warm",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "sweet-smelling",
+        "busy",
+        "public"
+      ]
+    },
+    {
+      "id": "theatre",
+      "emoji": "🎭",
+      "name": "Theatre",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "lively",
+      "light": "dim",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "public",
+        "dramatic"
+      ]
+    },
+    {
+      "id": "train_station",
+      "emoji": "🚉",
+      "name": "Train Station",
+      "inside": "partly inside",
+      "wetness": "dry",
+      "noise": "lively",
+      "light": "bright",
+      "temperature": "cool",
+      "elevation": "ground",
+      "distance": "far",
+      "tags": [
+        "busy",
+        "travel",
+        "public"
+      ]
+    },
+    {
+      "id": "market_square",
+      "emoji": "🏘️",
+      "name": "Market Square",
+      "inside": "outside",
+      "wetness": "dry",
+      "noise": "lively",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "public",
+        "colorful"
+      ]
+    },
+    {
+      "id": "cottage",
+      "emoji": "🏡",
+      "name": "Cottage",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "bright",
+      "temperature": "warm",
+      "elevation": "ground",
+      "distance": "near",
+      "tags": [
+        "private",
+        "homey"
+      ]
+    },
+    {
+      "id": "burrow",
+      "emoji": "🕳️",
+      "name": "Burrow",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "dim",
+      "temperature": "mild",
+      "elevation": "underground",
+      "distance": "near",
+      "tags": [
+        "private",
+        "underground"
+      ]
+    },
+    {
+      "id": "treehouse",
+      "emoji": "🌳",
+      "name": "Treehouse",
+      "inside": "partly inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "bright",
+      "temperature": "mild",
+      "elevation": "high",
+      "distance": "near",
+      "tags": [
+        "leafy",
+        "elevated",
+        "private"
+      ]
+    },
+    {
+      "id": "observatory",
+      "emoji": "🔭",
+      "name": "Observatory",
+      "inside": "inside",
+      "wetness": "dry",
+      "noise": "quiet",
+      "light": "dim",
+      "temperature": "cool",
+      "elevation": "high",
+      "distance": "far",
+      "tags": [
+        "nighttime",
+        "stargazing",
+        "public"
+      ]
+    }
+  ],
+  "flowers": [
+    {
+      "id": "rose",
+      "emoji": "🌹",
+      "name": "Rose",
+      "colors": [
+        "red",
+        "pink",
+        "white"
+      ],
+      "scent": "strong",
+      "catSafety": "PPE",
+      "pricePerStem": 4
+    },
+    {
+      "id": "tulip",
+      "emoji": "🌷",
+      "name": "Tulip",
+      "colors": [
+        "red",
+        "yellow",
+        "pink",
+        "purple"
+      ],
+      "scent": "mild",
+      "catSafety": "PPE",
+      "pricePerStem": 3
+    },
+    {
+      "id": "daisy",
+      "emoji": "🌼",
+      "name": "Daisy",
+      "colors": [
+        "white",
+        "yellow"
+      ],
+      "scent": "mild",
+      "catSafety": "okay",
+      "pricePerStem": 2
+    },
+    {
+      "id": "sunflower",
+      "emoji": "🌻",
+      "name": "Sunflower",
+      "colors": [
+        "yellow",
+        "brown"
+      ],
+      "scent": "mild",
+      "catSafety": "okay",
+      "pricePerStem": 5
+    },
+    {
+      "id": "hyacinth",
+      "emoji": "🪻",
+      "name": "Hyacinth",
+      "colors": [
+        "purple",
+        "pink",
+        "white"
+      ],
+      "scent": "strong",
+      "catSafety": "PPE",
+      "pricePerStem": 4
+    },
+    {
+      "id": "hibiscus",
+      "emoji": "🌺",
+      "name": "Hibiscus",
+      "colors": [
+        "red",
+        "pink",
+        "yellow"
+      ],
+      "scent": "mild",
+      "catSafety": "okay",
+      "pricePerStem": 4
+    },
+    {
+      "id": "lotus",
+      "emoji": "🪷",
+      "name": "Lotus",
+      "colors": [
+        "pink",
+        "white"
+      ],
+      "scent": "mild",
+      "catSafety": "okay",
+      "pricePerStem": 5
+    },
+    {
+      "id": "marigold",
+      "emoji": "🏵️",
+      "name": "Marigold",
+      "colors": [
+        "orange",
+        "yellow"
+      ],
+      "scent": "strong",
+      "catSafety": "okay",
+      "pricePerStem": 3
+    }
+  ],
+  "categoryPools": {
+    "treats": [
+      "🍬 Hard candy",
+      "🍭 Lollipop",
+      "🍫 Chocolate bar",
+      "🍪 Cookie",
+      "🍩 Donut",
+      "🧁 Cupcake",
+      "🍮 Pudding",
+      "🍯 Honey candy",
+      "🍡 Dango",
+      "🍿 Caramel popcorn",
+      "🍦 Ice cream",
+      "🥨 Sweet pretzel",
+      "Gummy candy",
+      "Caramel",
+      "Marshmallow",
+      "Macaron"
+    ],
+    "seafoodDishes": [
+      "🍣 Sushi",
+      "🍤 Tempura shrimp",
+      "🍥 Fish cake",
+      "🍜 Seafood noodles",
+      "🍱 Seafood bento",
+      "🍢 Fish-cake skewer",
+      "Seafood curry",
+      "Seafood pasta",
+      "Fish-and-chips",
+      "Clam chowder",
+      "Crab roll",
+      "Shrimp dumplings"
+    ],
+    "generalFoods": [
+      "🍕 Pizza",
+      "🍔 Burger",
+      "🍝 Pasta",
+      "🍛 Curry",
+      "🍲 Stew",
+      "🥪 Sandwich",
+      "🥞 Pancakes",
+      "🥗 Salad",
+      "🍞 Bread",
+      "🥟 Dumplings",
+      "🍙 Rice ball",
+      "🧇 Waffles"
+    ],
+    "drinks": [
+      "☕ Coffee",
+      "🥛 Milk",
+      "💧 Water",
+      "🧃 Juice",
+      "🥤 Soda",
+      "🍺 Beer",
+      "🍷 Wine",
+      "🥂 Sparkling wine",
+      "🍹 Fruity cocktail",
+      "🥃 Spirit drink",
+      "🍸 Martini"
+    ],
+    "ribbons": [
+      "❤️ Red",
+      "🧡 Orange",
+      "💛 Yellow",
+      "💚 Green",
+      "🩵 Light blue",
+      "💙 Blue",
+      "💜 Purple",
+      "🩷 Pink",
+      "🤍 White"
+    ],
+    "occasions": [
+      "🎂 Birthday",
+      "🎉 Congratulations",
+      "💌 Love letter",
+      "💍 Anniversary / engagement",
+      "🎓 Graduation",
+      "🍼 New baby",
+      "🙏 Apology",
+      "🤒 Get well",
+      "🏠 Housewarming",
+      "🍽️ Dinner party",
+      "🕯️ Memorial",
+      "🤝 Friendship",
+      "💪 Encouragement"
+    ],
+    "feelings": [
+      "😊 Cheerful",
+      "😴 Sleepy",
+      "🤩 Excited",
+      "😳 Shy",
+      "😌 Peaceful",
+      "🥶 Chilly",
+      "🥵 Warm",
+      "🤧 Sniffly",
+      "🥳 Celebratory",
+      "😠 Grumpy",
+      "🥺 Homesick",
+      "😵 Frazzled"
+    ],
+    "deliveryTimes": [
+      "🌅 Morning",
+      "☀️ Midday",
+      "🌇 Evening",
+      "🌙 Night"
+    ]
+  },
+  "generatorRules": {
+    "customerCount": [
+      3,
+      4,
+      5
+    ],
+    "categoryCount": [
+      3,
+      4
+    ],
+    "mandatoryCategories": [
+      "characters",
+      "bouquets"
+    ],
+    "noRepeatedCustomerInDay": true,
+    "allAssignmentsAreOneToOneExceptBouquetIngredients": true,
+    "clueAttributeVisibility": "Only generate a clue about an attribute when all displayed items in that category show that attribute.",
+    "sharedTagRule": "Only use a descriptive tag if it is shared by at least two options in the active category.\n"
+  }
+}
