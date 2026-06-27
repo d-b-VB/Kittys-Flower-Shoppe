@@ -5,6 +5,40 @@ const actions = {bouquets:'ordered', treats:'ordered', seafoodDishes:'ordered', 
 const negativeActions = {bouquets:'did not order', treats:'did not order', seafoodDishes:'did not order', generalFoods:'did not order', drinks:'did not order', ribbons:'did not choose', occasions:'did not send flowers for', feelings:'does not feel', deliveryTimes:'did not schedule', locations:'does not visit'};
 const attrEmoji = {country:'🏳️', continent:'🗺️', texture:'🧸', hobby:'🎨', likes:'💖', dislikesOrFears:'🙀', colors:'🎨', scent:'👃', catSafety:'🐈', inside:'🚪', wetness:'💧', noise:'🔊', light:'💡', temperature:'🌡️', elevation:'⛰️', distance:'📍', tags:'🏷️'};
 const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+function weightedDraw(items, weightFn){
+  const weighted = items.map(item => ({item, weight: weightFn(item)})).filter(entry => entry.weight > 0);
+  const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+  let roll = Math.random() * total;
+  return weighted.find(entry => (roll -= entry.weight) <= 0)?.item || weighted.at(-1)?.item;
+}
+function seatWeight(rosterIndex, seatIndex){
+  if(seatIndex === 0){
+    if(rosterIndex < 4) return 0.20;
+    if(rosterIndex < 12) return 0.1778 / 8;
+    if(rosterIndex < 28) return 0.0209 / 16;
+    return 0.0013 / 32;
+  }
+  if(seatIndex === 1){
+    if(rosterIndex < 12) return 1 / 13;
+    if(rosterIndex < 28) return 0.0724 / 16;
+    return 0.0045 / 32;
+  }
+  if(seatIndex === 2){
+    if(rosterIndex < 28) return 1 / 29;
+    return (1 / 29) / 32;
+  }
+  return 1;
+}
+function stockCustomers(roster, count){
+  const remaining = roster.map((item, rosterIndex) => ({...item, rosterIndex}));
+  const seats = [];
+  for(let seatIndex = 0; seatIndex < count; seatIndex++){
+    const picked = weightedDraw(remaining, item => seatWeight(item.rosterIndex, seatIndex));
+    seats.push(picked);
+    remaining.splice(remaining.findIndex(item => item.id === picked.id), 1);
+  }
+  return shuffle(seats).map(({rosterIndex, ...item}) => item);
+}
 const itemText = item => `${item.emoji ? item.emoji + ' ' : ''}${item.name || item}`;
 const emojiCode = emoji => [...emoji].filter(ch => ch !== '\ufe0f').map(ch => ch.codePointAt(0).toString(16)).join('_');
 const emojiMarkup = emoji => String(emoji || '').split(/\s+/).filter(Boolean).map(part => `<img class="noto-emoji" src="https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u${emojiCode(part)}.png" alt="${part}" loading="lazy" decoding="async">`).join('');
@@ -31,8 +65,13 @@ function poolItems(key){
   });
 }
 function newPuzzle(customerCount, categoryCount){
-  const extraKeys = shuffle(['locations', ...Object.keys(seed.categoryPools)]).slice(0, categoryCount - 2);
-  const cats = ['characters','bouquets',...extraKeys].map(key => ({key, label: categoryLabels[key] || key, items: shuffle(poolItems(key)).slice(0, customerCount)}));
+  const optionalKeys = ['locations', ...Object.keys(seed.categoryPools)].filter(key => poolItems(key).length >= customerCount);
+  const extraKeys = shuffle(optionalKeys).slice(0, categoryCount - 2);
+  const cats = ['characters','bouquets',...extraKeys].map(key => {
+    const items = poolItems(key);
+    const activeItems = key === 'characters' ? stockCustomers(items, customerCount) : shuffle(items).slice(0, customerCount);
+    return {key, label: categoryLabels[key] || key, items: activeItems};
+  });
   const characters = cats[0].items;
   const solution = {};
   cats.slice(1).forEach(cat => {
@@ -125,6 +164,22 @@ function makeCandidateClues(puzzle){
 }
 function findById(cat,id){ return cat.items.find(i=>i.id===id); }
 function permutations(arr){ if(arr.length<2) return [arr]; return arr.flatMap((v,i)=>permutations(arr.filter((_,j)=>i!==j)).map(p=>[v,...p])); }
+function enumerateSolutions(puzzle){
+  const ids = puzzle.characters.map(c=>c.id);
+  const cats = puzzle.cats.slice(1);
+  const permsByCat = cats.map(cat => permutations(cat.items.map(i=>i.id)));
+  let solutions = [{}];
+  cats.forEach((cat, catIndex) => {
+    const nextSolutions = [];
+    solutions.forEach(partial => permsByCat[catIndex].forEach(perm => {
+      const next = {...partial};
+      ids.forEach((id,i) => { next[id] = {...(next[id] || {}), [cat.key]: perm[i]}; });
+      nextSolutions.push(next);
+    }));
+    solutions = nextSolutions;
+  });
+  return solutions;
+}
 function countSolutions(puzzle, clues, stop=2){
   const ids = puzzle.characters.map(c=>c.id);
   const cats = puzzle.cats.slice(1);
@@ -146,43 +201,79 @@ function countSolutions(puzzle, clues, stop=2){
   walk(0, {}, new Set());
   return n;
 }
+function solutionSpaceSize(puzzle){
+  return puzzle.cats.slice(1).reduce((size, cat) => size * permutations(cat.items.map(i=>i.id)).length, 1);
+}
 function makeMinimalClues(puzzle){
-  const chosen = [];
-  const required = new Set();
   const candidates = makeCandidateClues(puzzle);
-  const add = clue => { if(clue && !chosen.includes(clue)){ chosen.push(clue); return true; } return false; };
-  const require = clue => { if(add(clue)) required.add(clue); };
-  require(candidates.find(c => c.kind === 'categorical'));
-  require(candidates.find(c => c.kind === 'negative'));
-  require(candidates.find(c => c.positive));
-  puzzle.cats.slice(1).forEach((aCat, i) => puzzle.cats.slice(i+2).forEach(bCat => {
-    require(candidates.find(c => c.kind === 'cross' && c.cats.includes(aCat.key) && c.cats.includes(bCat.key)));
-  }));
-  const available = candidates.filter(c => !chosen.includes(c));
+  if(solutionSpaceSize(puzzle) > 250000) return fallbackMinimalClues(puzzle, candidates);
+  const allSolutions = enumerateSolutions(puzzle);
+  let remaining = allSolutions;
+  const chosen = [];
+  const unused = [...candidates];
+  while(remaining.length > 1 && unused.length){
+    const ranked = unused.map(clue => {
+      const nextRemaining = remaining.filter(s => clue.test(s));
+      return {clue, nextRemaining, eliminated: remaining.length - nextRemaining.length};
+    }).filter(result => result.eliminated > 0);
+    if(!ranked.length) break;
+    ranked.sort((a,b) => clueRank(b, chosen, remaining.length) - clueRank(a, chosen, remaining.length));
+    const best = ranked[0];
+    best.clue.contributed = true;
+    chosen.push(best.clue);
+    remaining = best.nextRemaining;
+    unused.splice(unused.indexOf(best.clue), 1);
+  }
+  let changed = true;
+  while(changed){
+    changed = false;
+    for(let i=chosen.length-1;i>=0;i--){
+      const trial = chosen.filter((_,j)=>j!==i);
+      const count = allSolutions.reduce((n,s) => n + (trial.every(c => c.test(s)) ? 1 : 0), 0);
+      if(count === 1){ chosen.splice(i,1); changed = true; }
+    }
+  }
+  const finalCount = allSolutions.reduce((n,s) => n + (chosen.every(c => c.test(s)) ? 1 : 0), 0);
+  if(finalCount !== 1 || chosen.some((clue, index) => allSolutions.filter(s => chosen.filter((_,j)=>j<index).every(c => c.test(s))).every(s => clue.test(s)))){
+    return fallbackMinimalClues(puzzle, candidates);
+  }
+  const ordered = orderClues(chosen);
+  const usedAttributes = collectUsedAttributes(ordered);
+  return {texts: ordered.map(c=>c.text), usedAttributes};
+}
+function clueRank(result, chosen, remainingCount){
+  const clue = result.clue;
+  const eliminationRatio = result.eliminated / remainingCount;
+  const recent = chosen.slice(-2);
+  const kindPenalty = recent.some(c => c.kind === clue.kind) ? 0.08 : 0;
+  const entityPenalty = recent.reduce((n,c) => n + (c.entities || []).filter(e => (clue.entities || []).includes(e)).length, 0) * 0.06;
+  const directPenalty = clue.kind === 'direct' ? 0.12 : 0;
+  const flowerDirectPenalty = clue.directCategory === 'bouquets' ? 0.18 : 0;
+  const mixBonus = clue.kind === 'categorical' ? 0.08 : clue.kind === 'cross' ? 0.06 : clue.kind === 'negative' ? 0.04 : 0;
+  return eliminationRatio + mixBonus - kindPenalty - entityPenalty - directPenalty - flowerDirectPenalty;
+}
+function fallbackMinimalClues(puzzle, candidates){
+  const chosen = [];
+  const available = [...candidates];
   while(countSolutions(puzzle, chosen) !== 1 && available.length){
     available.sort((a,b) => clueScore(a, chosen) - clueScore(b, chosen));
     chosen.push(available.shift());
   }
   for(let i=chosen.length-1;i>=0;i--){
-    if(required.has(chosen[i])) continue;
-    const trial = chosen.filter((_,j)=>j!==i);
-    if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1);
-  }
-  for(let i=chosen.length-1;i>=0;i--){
-    if(required.has(chosen[i]) || chosen[i].directCategory !== 'bouquets') continue;
-    const directBouquets = chosen.filter(c => c.directCategory === 'bouquets');
-    if(directBouquets.length <= 1) break;
     const trial = chosen.filter((_,j)=>j!==i);
     if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1);
   }
   const ordered = orderClues(chosen);
+  return {texts: ordered.map(c=>c.text), usedAttributes: collectUsedAttributes(ordered)};
+}
+function collectUsedAttributes(clues){
   const usedAttributes = new Map();
-  ordered.filter(c => c.kind === 'categorical' && c.attr).forEach(c => {
+  clues.filter(c => c.kind === 'categorical' && c.attr).forEach(c => {
     const attrs = usedAttributes.get(c.category) || new Set();
     attrs.add(c.attr);
     usedAttributes.set(c.category, attrs);
   });
-  return {texts: ordered.map(c=>c.text), usedAttributes};
+  return usedAttributes;
 }
 function clueScore(clue, chosen){
   const recent = chosen.slice(-2);
@@ -320,18 +411,36 @@ function setStatus(msg){ document.getElementById('status').textContent = msg; }
 function setupKitty(){
   const kitty = document.getElementById('kitty-runner');
   kitty.innerHTML = emojiMarkup('🐱');
+  const motion = {x: window.scrollX + window.innerWidth - 28, y: window.scrollY + 28, tx: window.scrollX + window.innerWidth - 28, ty: window.scrollY + 28, vx: 0, vy: 0, running: false};
+  const place = () => {
+    kitty.style.left = `${motion.x}px`;
+    kitty.style.top = `${motion.y}px`;
+  };
+  const step = () => {
+    const dx = motion.tx - motion.x;
+    const dy = motion.ty - motion.y;
+    motion.vx = (motion.vx + dx * 0.045) * 0.86;
+    motion.vy = (motion.vy + dy * 0.045) * 0.86;
+    motion.x += motion.vx;
+    motion.y += motion.vy;
+    place();
+    const speed = Math.hypot(motion.vx, motion.vy);
+    const distance = Math.hypot(dx, dy);
+    kitty.classList.toggle('running', speed > 1.2 || distance > 4);
+    kitty.style.rotate = `${Math.max(-18, Math.min(18, motion.vx * 0.8))}deg`;
+    if(speed > 0.08 || distance > 0.8) requestAnimationFrame(step);
+    else motion.running = false;
+  };
   const moveKitty = event => {
     if(!event.isPrimary && event.pointerType) return;
-    const x = Math.max(22, Math.min(window.innerWidth - 22, event.clientX));
-    const y = Math.max(22, Math.min(window.innerHeight - 22, event.clientY));
-    kitty.classList.add('running');
-    kitty.style.left = `${x}px`;
-    kitty.style.top = `${y}px`;
-    window.clearTimeout(kitty._settleTimer);
-    kitty._settleTimer = window.setTimeout(() => kitty.classList.remove('running'), 280);
+    motion.tx = Math.max(22, Math.min(document.documentElement.scrollWidth - 22, event.pageX));
+    motion.ty = Math.max(22, Math.min(document.documentElement.scrollHeight - 22, event.pageY));
+    if(!motion.running){ motion.running = true; requestAnimationFrame(step); }
   };
+  place();
   document.addEventListener('pointerdown', moveKitty, {passive:true});
 }
+
 async function init(){
   setupKitty();
   seed = await fetch('kitty_flower_shoppe_content_seed.json').then(r => r.json());
