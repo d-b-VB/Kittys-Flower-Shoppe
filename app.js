@@ -53,6 +53,9 @@ const categoryGridLabel = key => emojiMarkup(categoryEmoji[key] || '🏷️');
 const colorHex = {red:'#f87171', pink:'#f9a8d4', white:'#ffffff', yellow:'#fde047', brown:'#92400e', purple:'#c084fc', orange:'#fb923c'};
 const catSafetyLabel = value => ({okay:'Safe for cats', PPE:'Not safe for cats'}[value] || value);
 const colorDots = values => values.map(color => `<span class="color-dot" style="--dot:${colorHex[color] || color}" title="${color}"></span>`).join('');
+const valueEmoji = {spiders:'🕷️', spider:'🕷️', wind:'💨', books:'📚', grapes:'🍇', flowers:'🌸', honey:'🍯', rain:'🌧️', cold:'🥶', balloons:'🎈', bubbles:'🫧', brooms:'🧹', cheese:'🧀', mushrooms:'🍄', buttons:'🔘', tea:'🍵', bees:'🐝', songs:'🎵', bells:'🔔', 'loud bells':'🔔', 'deep water':'🌊', gardening:'🪴', sewing:'🧵', painting:'🎨'};
+const emojifyValue = value => valueEmoji[String(value).toLowerCase()] ? `${valueEmoji[String(value).toLowerCase()]} ${value}` : value;
+const emojifyValues = values => values.map(emojifyValue).join(', ');
 
 function flag(country){
   const map = {Argentina:'AR', Australia:'AU', Bahamas:'BS', Brazil:'BR', Canada:'CA', China:'CN', 'Costa Rica':'CR', Denmark:'DK', Finland:'FI', France:'FR', Germany:'DE', Greece:'GR', Iceland:'IS', India:'IN', Indonesia:'ID', Ireland:'IE', Japan:'JP', Kenya:'KE', Mexico:'MX', Mongolia:'MN', Morocco:'MA', Nepal:'NP', 'New Zealand':'NZ', Peru:'PE', Rwanda:'RW', Scotland:'GB', Slovenia:'SI', 'South Africa':'ZA', Spain:'ES', Switzerland:'CH', Syria:'SY', Tanzania:'TZ', Thailand:'TH', 'Türkiye':'TR', Uganda:'UG', 'United Kingdom':'GB', 'United States':'US', Wales:'GB'};
@@ -107,7 +110,7 @@ function relationText(a,b,positive=true){
 }
 function valuesFor(item, attr){ const v=item[attr]; return Array.isArray(v)?v:[v]; }
 function attrClueText(ch, cat, attr, value){
-  const phrase = cat.key === 'bouquets' ? `ordered a flower with ${factEmoji(attrEmoji[attr] || '🏷️')} ${value}` : `${verb(cat.key)} something with ${factEmoji(attrEmoji[attr] || '🏷️')} ${value}`;
+  const phrase = cat.key === 'bouquets' ? `ordered a flower with ${attr} ${emojifyValue(value)}` : `${verb(cat.key)} something with ${attr} ${emojifyValue(value)}`;
   return `${itemName(ch)} ${phrase}.`;
 }
 function activeSharedAttributes(cat){
@@ -121,13 +124,13 @@ function activeSharedAttributes(cat){
 }
 
 function customerAttributePhrase(attr, value){
-  if(attr === 'country') return `from ${factEmoji(attrEmoji[attr])} ${value}`;
-  if(attr === 'continent') return `from ${factEmoji(attrEmoji[attr])} ${value}`;
-  if(attr === 'texture') return `with ${factEmoji(attrEmoji[attr])} ${value} texture`;
-  if(attr === 'likes') return `who likes ${factEmoji(attrEmoji[attr])} ${value}`;
-  if(attr === 'dislikesOrFears') return `who fears ${factEmoji(attrEmoji[attr])} ${value}`;
-  if(attr === 'hobby') return `whose hobby is ${factEmoji(attrEmoji[attr])} ${value}`;
-  return `with ${factEmoji(attrEmoji[attr] || '🏷️')} ${attr} ${value}`;
+  if(attr === 'country') return `from ${value}`;
+  if(attr === 'continent') return `from ${value}`;
+  if(attr === 'texture') return `with ${value} texture`;
+  if(attr === 'likes') return `who likes ${emojifyValue(value)}`;
+  if(attr === 'dislikesOrFears') return `who fears ${emojifyValue(value)}`;
+  if(attr === 'hobby') return `whose hobby is ${emojifyValue(value)}`;
+  return `with ${attr} ${emojifyValue(value)}`;
 }
 function makeCandidateClues(puzzle){
   const clues = [];
@@ -311,8 +314,11 @@ function describeCustomer(customer){
   return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => customer[attr] !== undefined).map(attr => {
     if(attr === 'heightDisplay') return customer.heightDisplay;
     const value = valuesFor(customer, attr).join(', ');
-    if(attr === 'country') return `${factEmoji(flag(customer.country))} ${customer.country}`;
-    return `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
+    if(attr === 'country') return `${flag(customer.country)} ${customer.country}`;
+    if(attr === 'likes') return `likes: ${emojifyValues(valuesFor(customer, attr))}`;
+    if(attr === 'dislikesOrFears') return `fears: ${emojifyValues(valuesFor(customer, attr))}`;
+    if(attr === 'hobby') return `hobby: ${emojifyValue(value)}`;
+    return `${attr}: ${emojifyValue(value)}`;
   });
 }
 function renderCatalog(){
@@ -326,8 +332,8 @@ function describeItem(item, cat){
     const rawValues = valuesFor(item, attr);
     const value = rawValues.join(', ');
     if(attr === 'colors') return `colors: ${colorDots(rawValues)}`;
-    if(attr === 'catSafety') return `${factEmoji(attrEmoji[attr])} ${catSafetyLabel(item[attr])}`;
-    return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
+    if(attr === 'catSafety') return catSafetyLabel(item[attr]);
+    return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${attr}: ${emojifyValue(value)}`;
   });
 }
 function renderClues(){
@@ -361,11 +367,9 @@ function isActiveGridPair(rowCat, colCat, others){
 }
 function sectionClasses(rowCats, colCats, others){
   const classes = new Map();
-  let sectionIndex = 0;
-  rowCats.forEach(rowCat => colCats.forEach(colCat => {
+  rowCats.forEach((rowCat, rowIndex) => colCats.forEach((colCat, colIndex) => {
     if(!isActiveGridPair(rowCat, colCat, others)) return;
-    classes.set(sectionKey(rowCat, colCat), sectionIndex % 2 === 0 ? 'section-purple' : 'section-white');
-    sectionIndex++;
+    classes.set(sectionKey(rowCat, colCat), (rowIndex + colIndex) % 2 === 0 ? 'section-purple' : 'section-white');
   }));
   return classes;
 }
