@@ -30,8 +30,10 @@ function newPuzzle(customerCount, categoryCount){
     const assigned = shuffle(cat.items);
     characters.forEach((character, i) => { (solution[character.id] ||= {})[cat.key] = assigned[i]; });
   });
-  const puzzle = {cats, characters, solution};
-  puzzle.clues = makeMinimalClues(puzzle);
+  const puzzle = {cats, characters, solution, usedAttributes: new Map()};
+  const minimal = makeMinimalClues(puzzle);
+  puzzle.clues = minimal.texts;
+  puzzle.usedAttributes = minimal.usedAttributes;
   return puzzle;
 }
 function ownerOf(puzzle, item){ return puzzle.characters.find(ch => puzzle.solution[ch.id][item.category]?.id === item.id); }
@@ -72,7 +74,7 @@ function makeCandidateClues(puzzle){
     clues.push({text:relationText(ch,target,true), cats:[cat.key], test:s => s[ch.id][cat.key] === target.id, kind:'direct'});
     cat.items.filter(i => i.id !== target.id).forEach(item => clues.push({text:relationText(ch,item,false), cats:[cat.key], test:s => s[ch.id][cat.key] !== item.id, kind:'negative'}));
     activeSharedAttributes(cat).forEach(({attr,value}) => {
-      if(valuesFor(target, attr).includes(value)) clues.push({text:attrClueText(ch, cat, attr, value), cats:[cat.key], test:s => valuesFor(findById(cat, s[ch.id][cat.key]), attr).includes(value), kind:'attribute'});
+      if(valuesFor(target, attr).includes(value)) clues.push({text:attrClueText(ch, cat, attr, value), cats:[cat.key], attr, category:cat.key, test:s => valuesFor(findById(cat, s[ch.id][cat.key]), attr).includes(value), kind:'attribute'});
     });
   }));
   cats.slice(1).forEach((aCat, i) => cats.slice(i+2).forEach(bCat => {
@@ -116,19 +118,37 @@ function makeMinimalClues(puzzle){
   const preferred = candidates.sort((a,b)=>({attribute:0,cross:1,direct:2,negative:3}[a.kind]-{attribute:0,cross:1,direct:2,negative:3}[b.kind]));
   for(const clue of preferred){ chosen.push(clue); if(countSolutions(puzzle, chosen) === 1) break; }
   for(let i=chosen.length-1;i>=0;i--){ const trial = chosen.filter((_,j)=>j!==i); if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1); }
-  return chosen.map(c=>c.text);
+  const usedAttributes = new Map();
+  chosen.filter(c => c.kind === 'attribute').forEach(c => {
+    const attrs = usedAttributes.get(c.category) || new Set();
+    attrs.add(c.attr);
+    usedAttributes.set(c.category, attrs);
+  });
+  return {texts: chosen.map(c=>c.text), usedAttributes};
 }
 function key(a,b){ return [a.id,b.id].sort().join('|'); }
 function setMark(a,b,val){ state.marks.set(key(a,b), val); }
 function getMark(a,b){ return state.marks.get(key(a,b)) || ''; }
 function isCorrectPair(a,b){ return paired(state.puzzle,a,b); }
-function render(){ renderCards(); renderClues(); renderGrid(); document.getElementById('celebration').classList.add('hidden'); }
+function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); document.getElementById('celebration').classList.add('hidden'); }
 function renderCards(){
   document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div><span class="tag">${flag(c.country)} ${c.country}</span><span class="tag">${c.heightDisplay}</span><span class="tag">💖 ${c.likes.join(' & ')}</span><span class="tag">🎨 ${c.hobby}</span></div></article>`).join('');
 }
+function renderCatalog(){
+  const catalog = document.getElementById('category-cards');
+  catalog.innerHTML = state.puzzle.cats.slice(1).map(cat => `<section class="category-card"><h3>${cat.label}</h3>${cat.items.map(item => `<article><strong>${itemName(item)}</strong><div>${describeItem(item, cat).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('')}</section>`).join('');
+}
+function describeItem(item, cat){
+  const baseAttrs = cat.key === 'bouquets' ? ['colors','scent','catSafety','pricePerStem'] : cat.key === 'locations' ? ['inside','wetness','noise','light','temperature','elevation','distance','tags'] : [];
+  const clueAttrs = [...(state.puzzle.usedAttributes.get(cat.key) || [])];
+  return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => item[attr] !== undefined).map(attr => {
+    const value = valuesFor(item, attr).join(', ');
+    return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${attrEmoji[attr] || '🏷️'} ${attr}: ${value}`;
+  });
+}
 function renderClues(){ document.getElementById('clues').innerHTML = state.puzzle.clues.map(c => `<li>${c}</li>`).join(''); }
 function renderGrid(){
-  document.getElementById('grid-board').innerHTML = gridPairs(state.puzzle.cats).map(([rowCat,colCat]) => matrix(rowCat,colCat)).join('');
+  document.getElementById('grid-board').innerHTML = continuousGrid(state.puzzle.cats);
   document.querySelectorAll('.cell').forEach(cell => {
     const a = findItem(cell.dataset.a), b = findItem(cell.dataset.b);
     const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.className = `cell ${val}`; cell.setAttribute('aria-label', `${itemName(a)} and ${itemName(b)}: ${val || 'blank'}`); };
@@ -140,13 +160,28 @@ function renderGrid(){
     cell.addEventListener('pointerup', () => state.dragging = false);
   });
 }
-function gridPairs(cats){
-  const chars = cats.find(c=>c.key==='characters'), flowers = cats.find(c=>c.key==='bouquets'), others = cats.filter(c=>!['characters','bouquets'].includes(c.key));
-  return [[flowers, chars], ...others.map(c=>[c, chars]), ...others.map(c=>[flowers, c]), ...others.flatMap((a,i)=>others.slice(i+1).map(b=>[a,b]))];
+function continuousGrid(cats){
+  const chars = cats.find(c=>c.key==='characters');
+  const flowers = cats.find(c=>c.key==='bouquets');
+  const others = cats.filter(c=>!['characters','bouquets'].includes(c.key));
+  const colCats = [chars, ...others];
+  const rowCats = [flowers, ...others];
+  const headerGroups = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => `<th class="grouphead" colspan="${cat.items.length}">${cat.label}</th>`).join('')}</tr>`;
+  const headers = `<tr><th class="corner" colspan="2"></th>${colCats.map(cat => cat.items.map(i => `<th>${itemName(i)}</th>`).join('')).join('')}</tr>`;
+  const rows = rowCats.map(rowCat => rowCat.items.map((rowItem, itemIndex) => {
+    const rowHeader = itemIndex === 0 ? `<th class="rowgroup" rowspan="${rowCat.items.length}">${rowCat.label}</th>` : '';
+    return `<tr>${rowHeader}<th class="rowhead">${itemName(rowItem)}</th>${colCats.map(colCat => colCat.items.map(colItem => gridCell(rowCat, rowItem, colCat, colItem, others)).join('')).join('')}</tr>`;
+  }).join('')).join('');
+  return `<div class="continuous-grid"><table><thead>${headerGroups}${headers}</thead><tbody>${rows}</tbody></table></div>`;
 }
-function matrix(rowCat,colCat){
-  return `<section class="matrix"><h3>${rowCat.label} × ${colCat.label}</h3><table><thead><tr><th></th>${colCat.items.map(i=>`<th>${itemName(i)}</th>`).join('')}</tr></thead><tbody>${rowCat.items.map(r=>`<tr><th class="rowhead">${itemName(r)}</th>${colCat.items.map(c=>`<td class="cell" tabindex="0" role="button" data-a="${r.id}" data-b="${c.id}"></td>`).join('')}</tr>`).join('')}</tbody></table></section>`;
+function gridCell(rowCat, rowItem, colCat, colItem, others){
+  const rowOtherIndex = others.findIndex(c => c.key === rowCat.key);
+  const colOtherIndex = others.findIndex(c => c.key === colCat.key);
+  const active = rowCat.key !== colCat.key && (rowCat.key === 'bouquets' || colCat.key === 'characters' || colOtherIndex > rowOtherIndex);
+  if(!active) return '<td class="blank-cell" aria-hidden="true"></td>';
+  return `<td class="cell" tabindex="0" role="button" data-a="${rowItem.id}" data-b="${colItem.id}"></td>`;
 }
+
 function findItem(id){ return state.puzzle.cats.flatMap(c=>c.items).find(i=>i.id===id); }
 function autoFill(){
   const yesPairs = [...state.marks.entries()].filter(([,v])=>v==='yes').map(([k])=>k.split('|'));

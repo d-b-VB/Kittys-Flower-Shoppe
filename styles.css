@@ -65,3 +65,18 @@ th { background: #faf8ff; font-size: .82rem; padding: .25rem; }
   th, td { min-width: 38px; height: 38px; }
   .panel { padding: .75rem; }
 }
+.catalog { display: grid; gap: .75rem; margin-bottom: 1rem; }
+.category-card { border: 1px solid #eadff7; border-radius: 18px; padding: .7rem; background: #fff; }
+.category-card h3 { margin: 0 0 .5rem; color: var(--primary); }
+.category-card article { padding: .45rem 0; border-top: 1px solid #f0e9f8; }
+.category-card article:first-of-type { border-top: 0; }
+.continuous-grid { overflow: auto; border: 2px solid #ded0ef; border-radius: 18px; background: #fff; }
+.continuous-grid table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+.continuous-grid th, .continuous-grid td { border: 0; border-right: 1px solid #ded6e7; border-bottom: 1px solid #ded6e7; }
+.continuous-grid thead th { position: sticky; top: 0; z-index: 2; background: #faf8ff; }
+.continuous-grid .grouphead { background: var(--lav); border-bottom: 2px solid #cbb5e9; }
+.continuous-grid .rowgroup { min-width: 34px; writing-mode: vertical-rl; transform: rotate(180deg); background: var(--lav); color: var(--primary); font-weight: 900; border-right: 2px solid #cbb5e9; }
+.continuous-grid .rowhead { left: 0; min-width: 140px; }
+.continuous-grid .blank-cell { background: linear-gradient(135deg, #f6f1fb, #fff); }
+.continuous-grid .cell { background: #fff; }
+.continuous-grid .cell.yes { background: #eafff2; }
