@@ -95,3 +95,14 @@ th { background: #faf8ff; font-size: .82rem; padding: .25rem; }
   .continuous-grid .grouphead { font-size: .78rem; }
   .cell { font-size: 1.15rem; }
 }
+.clue-card { background: #fff; border: 2px solid var(--lav); border-radius: 18px; padding: .85rem; margin-bottom: 1rem; }
+.clue-card p { margin: .35rem 0; }
+.clue-count { color: var(--primary); font-weight: 900; font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; }
+.clue-nav { display: flex; gap: .5rem; margin-top: .75rem; }
+.clue-nav button { flex: 1; padding: .6rem .8rem; }
+.clue-nav button:disabled { opacity: .45; cursor: not-allowed; background: var(--silver); color: var(--muted); border-color: var(--silver); }
+@media (max-width: 640px) {
+  .game-layout { display: flex; flex-direction: column; }
+  .grid-panel { display: flex; flex-direction: column; gap: .5rem; }
+  .clue-card { position: sticky; top: .5rem; z-index: 5; box-shadow: 0 10px 24px #41304d22; }
+}

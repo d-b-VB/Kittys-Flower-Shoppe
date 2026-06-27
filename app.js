@@ -1,5 +1,5 @@
 let seed;
-const state = { puzzle: null, marks: new Map(), dragging: false };
+const state = { puzzle: null, marks: new Map(), dragging: false, clueIndex: 0 };
 const categoryLabels = {characters:'Customers', bouquets:'Flowers', locations:'Places', treats:'Treats', seafoodDishes:'Seafood', generalFoods:'Foods', drinks:'Drinks', ribbons:'Ribbons', occasions:'Occasions', feelings:'Feelings', deliveryTimes:'Delivery times'};
 const actions = {bouquets:'ordered', treats:'ordered', seafoodDishes:'ordered', generalFoods:'ordered', drinks:'ordered', ribbons:'chose the', occasions:'sent flowers for', feelings:'feels', deliveryTimes:'scheduled', locations:'visits'};
 const negativeActions = {bouquets:'did not order', treats:'did not order', seafoodDishes:'did not order', generalFoods:'did not order', drinks:'did not order', ribbons:'did not choose', occasions:'did not send flowers for', feelings:'does not feel', deliveryTimes:'did not schedule', locations:'does not visit'};
@@ -52,8 +52,9 @@ function relationText(a,b,positive=true){
   const ch = a.category === 'characters' ? a : b.category === 'characters' ? b : null;
   if(ch){ const other = ch === a ? b : a; return `${itemName(ch)} ${positive ? verb(other.category) : negativeActions[other.category]} ${itemName(other)}.`; }
   const flower = a.category === 'bouquets' ? a : b.category === 'bouquets' ? b : null;
-  const other = flower ? (flower === a ? b : a) : b;
-  const subject = flower ? `The customer who ordered ${itemName(flower)}` : `The same customer`;
+  const anchor = flower || a;
+  const other = anchor === a ? b : a;
+  const subject = `The customer who ${verb(anchor.category)} ${itemName(anchor)}`;
   const predicate = positive ? `${verb(other.category)} ${itemName(other)}` : `${negativeActions[other.category]} ${itemName(other)}`;
   return `${subject} ${predicate}.`;
 }
@@ -71,26 +72,50 @@ function activeSharedAttributes(cat){
     return [...counts].filter(([,n]) => n >= 2 && n < cat.items.length).map(([value]) => ({attr,value}));
   });
 }
+
+function customerAttributePhrase(attr, value){
+  if(attr === 'country') return `from ${factEmoji(attrEmoji[attr])} ${value}`;
+  if(attr === 'continent') return `from ${factEmoji(attrEmoji[attr])} ${value}`;
+  if(attr === 'texture') return `with ${factEmoji(attrEmoji[attr])} ${value} texture`;
+  if(attr === 'likes') return `who likes ${factEmoji(attrEmoji[attr])} ${value}`;
+  if(attr === 'dislikesOrFears') return `who fears ${factEmoji(attrEmoji[attr])} ${value}`;
+  if(attr === 'hobby') return `whose hobby is ${factEmoji(attrEmoji[attr])} ${value}`;
+  return `with ${factEmoji(attrEmoji[attr] || '🏷️')} ${attr} ${value}`;
+}
 function makeCandidateClues(puzzle){
   const clues = [];
   const cats = puzzle.cats;
   cats.slice(1).forEach(cat => puzzle.characters.forEach(ch => {
     const target = puzzle.solution[ch.id][cat.key];
-    clues.push({text:relationText(ch,target,true), cats:[cat.key], test:s => s[ch.id][cat.key] === target.id, kind:'direct'});
-    cat.items.filter(i => i.id !== target.id).forEach(item => clues.push({text:relationText(ch,item,false), cats:[cat.key], test:s => s[ch.id][cat.key] !== item.id, kind:'negative'}));
+    clues.push({text:relationText(ch,target,true), cats:[cat.key], entities:[ch.id,target.id], test:s => s[ch.id][cat.key] === target.id, kind:'direct', positive:true, directCategory:cat.key});
+    cat.items.filter(i => i.id !== target.id).forEach(item => clues.push({text:relationText(ch,item,false), cats:[cat.key], entities:[ch.id,item.id], test:s => s[ch.id][cat.key] !== item.id, kind:'negative', positive:false}));
     activeSharedAttributes(cat).forEach(({attr,value}) => {
-      if(valuesFor(target, attr).includes(value)) clues.push({text:attrClueText(ch, cat, attr, value), cats:[cat.key], attr, category:cat.key, test:s => valuesFor(findById(cat, s[ch.id][cat.key]), attr).includes(value), kind:'attribute'});
+      if(valuesFor(target, attr).includes(value)) clues.push({text:attrClueText(ch, cat, attr, value), cats:[cat.key], entities:[ch.id, `${cat.key}:${attr}:${value}`], attr, category:cat.key, test:s => valuesFor(findById(cat, s[ch.id][cat.key]), attr).includes(value), kind:'categorical', positive:true});
     });
   }));
   cats.slice(1).forEach((aCat, i) => cats.slice(i+2).forEach(bCat => {
     aCat.items.forEach(a => bCat.items.forEach(b => {
       const yes = paired(puzzle,a,b);
-      clues.push({text:relationText(a,b,yes), cats:[aCat.key,bCat.key], test:s => {
+      clues.push({text:relationText(a,b,yes), cats:[aCat.key,bCat.key], entities:[a.id,b.id], test:s => {
         const ca = Object.keys(s).find(ch => s[ch][a.category] === a.id);
         const cb = Object.keys(s).find(ch => s[ch][b.category] === b.id);
         return yes ? ca === cb : ca !== cb;
-      }, kind:yes?'cross':'negative'});
+      }, kind:yes?'cross':'negative', positive:yes});
     }));
+  }));
+
+  const charCat = cats[0];
+  cats.slice(1).forEach(cat => activeSharedAttributes(charCat).forEach(({attr,value}) => {
+    const matchingCustomers = puzzle.characters.filter(ch => valuesFor(ch, attr).includes(value));
+    if(!matchingCustomers.length || matchingCustomers.length === puzzle.characters.length) return;
+    cat.items.forEach(item => {
+      const anyMatch = matchingCustomers.some(ch => puzzle.solution[ch.id][cat.key].id === item.id);
+      if(anyMatch){
+        clues.push({text:`A customer ${customerAttributePhrase(attr, value)} ${verb(cat.key)} ${itemName(item)}.`, cats:[cat.key], entities:[`${attr}:${value}`, item.id], attr, category:'characters', test:s => matchingCustomers.some(ch => s[ch.id][cat.key] === item.id), kind:'categorical', positive:true});
+      } else {
+        clues.push({text:`No customer ${customerAttributePhrase(attr, value)} ${verb(cat.key)} ${itemName(item)}.`, cats:[cat.key], entities:[`${attr}:${value}`, item.id], attr, category:'characters', test:s => matchingCustomers.every(ch => s[ch.id][cat.key] !== item.id), kind:'categorical', positive:false});
+      }
+    });
   }));
   return shuffle(clues);
 }
@@ -119,17 +144,59 @@ function countSolutions(puzzle, clues, stop=2){
 }
 function makeMinimalClues(puzzle){
   const chosen = [];
+  const required = new Set();
   const candidates = makeCandidateClues(puzzle);
-  const preferred = candidates.sort((a,b)=>({attribute:0,cross:1,direct:2,negative:3}[a.kind]-{attribute:0,cross:1,direct:2,negative:3}[b.kind]));
-  for(const clue of preferred){ chosen.push(clue); if(countSolutions(puzzle, chosen) === 1) break; }
-  for(let i=chosen.length-1;i>=0;i--){ const trial = chosen.filter((_,j)=>j!==i); if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1); }
+  const add = clue => { if(clue && !chosen.includes(clue)){ chosen.push(clue); return true; } return false; };
+  const require = clue => { if(add(clue)) required.add(clue); };
+  require(candidates.find(c => c.kind === 'categorical'));
+  require(candidates.find(c => c.kind === 'negative'));
+  require(candidates.find(c => c.positive));
+  puzzle.cats.slice(1).forEach((aCat, i) => puzzle.cats.slice(i+2).forEach(bCat => {
+    require(candidates.find(c => c.kind === 'cross' && c.cats.includes(aCat.key) && c.cats.includes(bCat.key)));
+  }));
+  const available = candidates.filter(c => !chosen.includes(c));
+  while(countSolutions(puzzle, chosen) !== 1 && available.length){
+    available.sort((a,b) => clueScore(a, chosen) - clueScore(b, chosen));
+    chosen.push(available.shift());
+  }
+  for(let i=chosen.length-1;i>=0;i--){
+    if(required.has(chosen[i])) continue;
+    const trial = chosen.filter((_,j)=>j!==i);
+    if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1);
+  }
+  for(let i=chosen.length-1;i>=0;i--){
+    if(required.has(chosen[i]) || chosen[i].directCategory !== 'bouquets') continue;
+    const directBouquets = chosen.filter(c => c.directCategory === 'bouquets');
+    if(directBouquets.length <= 1) break;
+    const trial = chosen.filter((_,j)=>j!==i);
+    if(countSolutions(puzzle, trial) === 1) chosen.splice(i,1);
+  }
+  const ordered = orderClues(chosen);
   const usedAttributes = new Map();
-  chosen.filter(c => c.kind === 'attribute').forEach(c => {
+  ordered.filter(c => c.kind === 'categorical' && c.attr).forEach(c => {
     const attrs = usedAttributes.get(c.category) || new Set();
     attrs.add(c.attr);
     usedAttributes.set(c.category, attrs);
   });
-  return {texts: chosen.map(c=>c.text), usedAttributes};
+  return {texts: ordered.map(c=>c.text), usedAttributes};
+}
+function clueScore(clue, chosen){
+  const recent = chosen.slice(-2);
+  const kindPenalty = recent.some(c => c.kind === clue.kind) ? 8 : 0;
+  const entityPenalty = recent.reduce((n,c) => n + (c.entities || []).filter(e => (clue.entities || []).includes(e)).length, 0) * 6;
+  const directPenalty = clue.kind === 'direct' ? 12 : 0;
+  const flowerDirectPenalty = clue.directCategory === 'bouquets' ? 18 : 0;
+  const kindBonus = clue.kind === 'categorical' ? -6 : clue.kind === 'cross' ? -4 : clue.kind === 'negative' ? -2 : 0;
+  return kindPenalty + entityPenalty + directPenalty + flowerDirectPenalty + kindBonus + Math.random();
+}
+function orderClues(clues){
+  const remaining = [...clues];
+  const ordered = [];
+  while(remaining.length){
+    remaining.sort((a,b) => clueScore(a, ordered) - clueScore(b, ordered));
+    ordered.push(remaining.shift());
+  }
+  return ordered;
 }
 function key(a,b){ return [a.id,b.id].sort().join('|'); }
 function setMark(a,b,val){ state.marks.set(key(a,b), val); }
@@ -151,7 +218,15 @@ function describeItem(item, cat){
     return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${factEmoji(attrEmoji[attr] || '🏷️')} ${attr}: ${value}`;
   });
 }
-function renderClues(){ document.getElementById('clues').innerHTML = state.puzzle.clues.map(c => `<li>${c}</li>`).join(''); }
+function renderClues(){
+  state.clueIndex = Math.min(state.clueIndex, state.puzzle.clues.length - 1);
+  const clue = state.puzzle.clues[state.clueIndex];
+  document.getElementById('clues').innerHTML = `<div class="clue-card"><p class="clue-count">Clue ${state.clueIndex + 1} of ${state.puzzle.clues.length}</p><p>${clue}</p><div class="clue-nav"><button type="button" id="prev-clue">Previous</button><button type="button" id="next-clue">Next</button></div></div>`;
+  document.getElementById('prev-clue').disabled = state.clueIndex === 0;
+  document.getElementById('next-clue').disabled = state.clueIndex === state.puzzle.clues.length - 1;
+  document.getElementById('prev-clue').addEventListener('click', () => { state.clueIndex--; renderClues(); });
+  document.getElementById('next-clue').addEventListener('click', () => { state.clueIndex++; renderClues(); });
+}
 function renderGrid(){
   document.getElementById('grid-board').innerHTML = continuousGrid(state.puzzle.cats);
   document.querySelectorAll('.cell').forEach(cell => {
@@ -215,7 +290,7 @@ async function init(){
   seed = await fetch('kitty_flower_shoppe_content_seed.json').then(r => r.json());
   const customerCount = document.getElementById('customer-count');
   const categoryCount = document.getElementById('category-count');
-  document.getElementById('new-game-form').addEventListener('submit', e => { e.preventDefault(); state.marks.clear(); state.puzzle = newPuzzle(+customerCount.value, +categoryCount.value); render(); setStatus(`New puzzle ready with ${state.puzzle.clues.length} minimal clues.`); });
+  document.getElementById('new-game-form').addEventListener('submit', e => { e.preventDefault(); state.marks.clear(); state.clueIndex = 0; state.puzzle = newPuzzle(+customerCount.value, +categoryCount.value); render(); setStatus(`New puzzle ready with ${state.puzzle.clues.length} minimal clues.`); });
   document.getElementById('auto-fill').addEventListener('click', autoFill);
   document.getElementById('check').addEventListener('click', check);
   document.getElementById('reveal').addEventListener('click', reveal);
