@@ -151,12 +151,12 @@ h1 {
 .victory-targets { display: inline-flex; flex-wrap: wrap; gap: .3rem; }
 .victory-target { display: inline-flex; align-items: center; gap: .15rem; padding: .18rem .4rem; border-radius: 999px; background: #f0e5ff; animation: joyful-bounce 900ms ease both; animation-delay: calc(180ms + var(--i) * 130ms); }
 .butterfly, .sparkle { position: absolute; z-index: 0; pointer-events: none; opacity: .9; }
-.butterfly { left: calc((var(--i) * 13%) % 95%); top: 72%; animation: butterfly-lilt 4.2s ease-in-out infinite; animation-delay: calc(var(--i) * -420ms); }
-.sparkle { left: calc((var(--i) * 19%) % 98%); top: calc(12% + (var(--i) * 9%) % 78%); animation: sparkle-float 2.8s ease-in-out infinite; animation-delay: calc(var(--i) * -190ms); }
+.butterfly { left: calc((var(--i) * 13%) % 95%); top: 72%; animation: butterfly-lilt 7.2s ease-in-out infinite; animation-delay: calc(var(--i) * -420ms); }
+.sparkle { left: 50%; top: 45%; animation: sparkle-burst 1.9s ease-out infinite; animation-delay: calc(var(--i) * -75ms); }
 @keyframes slide-to-order { from { transform: translateX(-45vw) scale(.8); opacity: 0; } 70% { transform: translateX(8px) scale(1.08); opacity: 1; } to { transform: translateX(0) scale(1); opacity: 1; } }
 @keyframes joyful-bounce { 0% { transform: translateY(16px) scale(.96); opacity: 0; } 60% { transform: translateY(-5px) scale(1.03); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes butterfly-lilt { 0% { transform: translate(0, 42px) rotate(calc(var(--spin) * -0.5)); } 25% { transform: translate(var(--dx), calc(-42px + var(--dy))) rotate(var(--spin)); } 50% { transform: translate(calc(var(--dx) * -0.6), calc(-122px - var(--dy))) rotate(calc(var(--spin) * -0.8)); } 75% { transform: translate(calc(var(--dx) * .7), calc(-36px + var(--dy))) rotate(calc(var(--spin) * .6)); } 100% { transform: translate(0, 42px) rotate(calc(var(--spin) * -0.5)); } }
-@keyframes sparkle-float { 0%,100% { transform: translateY(16px) scale(.75); opacity: .25; } 50% { transform: translateY(-20px) scale(1.15); opacity: 1; } }
+@keyframes sparkle-burst { 0% { transform: rotate(var(--angle)) translateX(0) scale(.35); opacity: 0; } 18% { opacity: 1; } 75% { transform: rotate(var(--angle)) translateX(var(--burst)) scale(1.15); opacity: .85; } 100% { transform: rotate(var(--angle)) translateX(calc(var(--burst) + 18px)) scale(.4); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .victory-order, .victory-character, .victory-target, .butterfly, .sparkle { animation: none; }
 }
@@ -164,3 +164,8 @@ h1 {
 .continuous-grid .section-purple.yes { background: linear-gradient(135deg, #c9f8d9, #dec2ff 78%); }
 .next-puzzle { margin-top: .75rem; padding: .55rem .9rem; font-size: .9rem; box-shadow: 0 8px 18px #9933ff22; }
 .reward-fact { flex-basis: 100%; margin-left: .2rem; color: var(--muted); font-size: .9rem; font-weight: 800; }
+.cell.pressing { outline: 3px solid #9933ff88; outline-offset: -4px; }
+.party-emoji { animation: party-hop 1.45s ease-in-out infinite; animation-delay: calc((var(--i, 0) + var(--j, 0)) * -160ms); }
+.victory-character.party-emoji { font-size: 1.25rem; }
+.victory-target.party-emoji { animation-name: party-hop, joyful-bounce; }
+@keyframes party-hop { 0%,100% { transform: translate(0, 0) rotate(-3deg) scale(1); } 25% { transform: translate(6px, -10px) rotate(6deg) scale(1.08); } 50% { transform: translate(-4px, 3px) rotate(-5deg) scale(.98); } 75% { transform: translate(3px, -7px) rotate(4deg) scale(1.05); } }

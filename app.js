@@ -379,12 +379,26 @@ function renderGrid(){
   document.querySelectorAll('.cell').forEach(cell => {
     const a = findItem(cell.dataset.a), b = findItem(cell.dataset.b);
     const sync = val => { cell.textContent = val === 'yes' ? '✓' : val === 'x' ? '×' : ''; cell.classList.toggle('x', val === 'x'); cell.classList.toggle('yes', val === 'yes'); cell.setAttribute('aria-label', `${itemText(a)} and ${itemText(b)}: ${val || 'blank'}`); };
+    const advance = () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); maybeCelebrate(); };
     sync(getMark(a,b));
-    cell.addEventListener('click', () => { const next = { '':'x', x:'yes', yes:'' }[getMark(a,b)]; setMark(a,b,next); sync(next); maybeCelebrate(); });
-    cell.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); cell.click(); } });
-    cell.addEventListener('pointerdown', e => { state.dragging = true; cell.setPointerCapture(e.pointerId); });
+    cell.addEventListener('click', event => {
+      if(cell.dataset.suppressClick === '1'){ cell.dataset.suppressClick = '0'; return; }
+      if(cell.dataset.pointerType === 'touch' || cell.dataset.pointerType === 'pen') return;
+      advance();
+    });
+    cell.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); advance(); } });
+    cell.addEventListener('pointerdown', e => {
+      cell.dataset.pointerType = e.pointerType || 'mouse';
+      cell.setPointerCapture(e.pointerId);
+      if(e.pointerType === 'touch' || e.pointerType === 'pen'){
+        cell.classList.add('pressing');
+        cell._pressTimer = window.setTimeout(() => { advance(); cell.dataset.suppressClick = '1'; cell.classList.remove('pressing'); }, 560);
+      } else {
+        state.dragging = true;
+      }
+    });
     cell.addEventListener('pointerenter', () => { if(state.dragging && !getMark(a,b)){ setMark(a,b,'x'); sync('x'); maybeCelebrate(); } });
-    cell.addEventListener('pointerup', () => state.dragging = false);
+    ['pointerup','pointercancel','pointerleave'].forEach(type => cell.addEventListener(type, () => { window.clearTimeout(cell._pressTimer); cell.classList.remove('pressing'); if(type !== 'pointerleave') state.dragging = false; }));
   });
 }
 
@@ -470,15 +484,15 @@ function reveal(){ state.puzzle.characters.forEach(ch => state.puzzle.cats.slice
 function celebrate(){
   state.completed = true;
   const butterflies = Array.from({length: 8}, (_, i) => `<span class="butterfly" style="--i:${i};--dx:${(i % 4 - 1.5) * 34}px;--dy:${(i % 3 - 1) * 24}px;--spin:${i % 2 ? 16 : -16}deg">${emojiMarkup('🦋')}</span>`).join('');
-  const sparkles = Array.from({length: 14}, (_, i) => `<span class="sparkle" style="--i:${i}">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
+  const sparkles = Array.from({length: 24}, (_, i) => `<span class="sparkle" style="--i:${i};--angle:${i * 15}deg;--burst:${70 + (i % 5) * 18}px">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
   const rows = state.puzzle.characters.map((ch, index) => {
-    const targets = state.puzzle.cats.slice(1).map(cat => `<span class="victory-target">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
+    const targets = state.puzzle.cats.slice(1).map((cat, targetIndex) => `<span class="victory-target party-emoji" style="--j:${targetIndex}">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
     const rewardAttr = state.puzzle.rewardCustomerAttrs?.get(ch.id);
     const reward = rewardAttr ? `<span class="reward-fact">Bonus: ${formatCustomerAttribute(ch, rewardAttr)}</span>` : '';
-    return `<li class="victory-order" style="--i:${index}"><span class="victory-character">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span>${reward}</li>`;
+    return `<li class="victory-order" style="--i:${index}"><span class="victory-character party-emoji">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span>${reward}</li>`;
   }).join('');
   const box=document.getElementById('celebration');
-  box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><p>Everyone bounces together with bouquets, butterflies, and sparkles.</p><button type="button" id="next-puzzle" class="next-puzzle">Next puzzle</button></div>`;
+  box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><button type="button" id="next-puzzle" class="next-puzzle">Next puzzle</button></div>`;
   box.classList.remove('hidden');
   document.getElementById('next-puzzle').addEventListener('click', () => document.getElementById('new-game-form').requestSubmit());
   requestAnimationFrame(() => box.scrollIntoView({behavior:'smooth', block:'start'}));
