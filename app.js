@@ -71,12 +71,62 @@ function poolItems(key){
     return {id:`${key}-${i}-${label.toLowerCase().replace(/\W+/g,'-')}`, name:parts.slice(1).join(' ') || label, emoji:parts[0], category:key};
   });
 }
+
+function chooseBouquetSize(flowerCount, customerCount){
+  for(let size = 1; size <= flowerCount; size++){
+    if(combinationsCount(flowerCount, size) < customerCount) continue;
+    if(size === flowerCount || Math.random() < 0.6) return size;
+  }
+  return Math.min(flowerCount, customerCount);
+}
+function combinationsCount(n, k){
+  if(k < 0 || k > n) return 0;
+  let result = 1;
+  for(let i = 1; i <= k; i++) result = result * (n - k + i) / i;
+  return Math.round(result);
+}
+function combinations(items, size){
+  if(size === 0) return [[]];
+  if(items.length < size) return [];
+  if(size === 1) return items.map(item => [item]);
+  return items.flatMap((item, index) => combinations(items.slice(index + 1), size - 1).map(rest => [item, ...rest]));
+}
+function makeBouquetOptions(customerCount){
+  const flowers = poolItems('bouquets');
+  const size = chooseBouquetSize(flowers.length, customerCount);
+  return shuffle(combinations(flowers, size)).slice(0, customerCount).map(parts => {
+    const ids = parts.map(f => f.id).sort();
+    const colors = [...new Set(parts.flatMap(f => f.colors || []))];
+    const scents = [...new Set(parts.map(f => f.scent).filter(Boolean))];
+    return {
+      id:`bouquet-${ids.join('-')}`,
+      name:parts.map(f => f.name).join(' + '),
+      emoji:parts.map(f => f.emoji).join(' '),
+      category:'bouquets',
+      flowers:parts,
+      componentIds:ids,
+      colors,
+      scent:scents.length === 1 ? scents[0] : 'mixed',
+      catSafety:parts.every(f => f.catSafety === 'okay') ? 'okay' : 'PPE',
+      pricePerStem:parts.reduce((sum, f) => sum + (Number(f.pricePerStem) || 0), 0),
+      bouquetSize:size
+    };
+  });
+}
+function bouquetHasFlower(bouquet, flower){ return (bouquet.componentIds || [bouquet.id]).includes(flower.id); }
+
+function flowerPhrase(flower, plural=true){
+  const name = String(flower.name || '').toLowerCase();
+  const pluralNames = {rose:'roses', tulip:'tulips', daisy:'daisies', sunflower:'sunflowers', hyacinth:'hyacinths', hibiscus:'hibiscus flowers', lotus:'lotuses', marigold:'marigolds'};
+  return `${emojiMarkup(flower.emoji)} ${plural ? (pluralNames[name] || `${name}s`) : name}`;
+}
+
 function newPuzzle(customerCount, categoryCount){
   const optionalKeys = ['locations', ...Object.keys(seed.categoryPools)].filter(key => poolItems(key).length >= customerCount);
   const extraKeys = shuffle(optionalKeys).slice(0, categoryCount - 2);
   const cats = ['characters','bouquets',...extraKeys].map(key => {
-    const items = poolItems(key);
-    const activeItems = key === 'characters' ? stockCustomers(items, customerCount) : shuffle(items).slice(0, customerCount);
+    const items = key === 'bouquets' ? makeBouquetOptions(customerCount) : poolItems(key);
+    const activeItems = key === 'characters' ? stockCustomers(items, customerCount) : items.slice(0, customerCount);
     return {key, label: categoryLabels[key] || key, items: activeItems};
   });
   const characters = cats[0].items;
@@ -85,7 +135,7 @@ function newPuzzle(customerCount, categoryCount){
     const assigned = shuffle(cat.items);
     characters.forEach((character, i) => { (solution[character.id] ||= {})[cat.key] = assigned[i]; });
   });
-  const puzzle = {cats, characters, solution, usedAttributes: new Map()};
+  const puzzle = {cats, characters, solution, usedAttributes: new Map(), baseFlowers: poolItems('bouquets')};
   const minimal = makeMinimalClues(puzzle);
   puzzle.clues = minimal.texts;
   puzzle.usedAttributes = minimal.usedAttributes;
@@ -153,6 +203,21 @@ function makeCandidateClues(puzzle){
     activeSharedAttributes(cat).forEach(({attr,value}) => {
       if(valuesFor(target, attr).includes(value)) clues.push({text:attrClueText(ch, cat, attr, value), cats:[cat.key], entities:[ch.id, `${cat.key}:${attr}:${value}`], attr, category:cat.key, test:s => valuesFor(findById(cat, s[ch.id][cat.key]), attr).includes(value), kind:'categorical', positive:true});
     });
+    if(cat.key === 'bouquets'){
+      puzzle.baseFlowers.forEach(flower => {
+        const hasFlower = bouquetHasFlower(target, flower);
+        clues.push({
+          text: hasFlower ? `${itemName(ch)} ordered at least one ${flowerPhrase(flower, false)}.` : `${itemName(ch)} did not order any ${flowerPhrase(flower)}.`,
+          cats:[cat.key],
+          entities:[ch.id, `flower:${flower.id}`],
+          attr:'flowers',
+          category:cat.key,
+          test:s => bouquetHasFlower(findById(cat, s[ch.id][cat.key]), flower) === hasFlower,
+          kind: hasFlower ? 'categorical' : 'negative',
+          positive: hasFlower
+        });
+      });
+    }
   }));
   cats.slice(1).forEach((aCat, i) => cats.slice(i+2).forEach(bCat => {
     aCat.items.forEach(a => bCat.items.forEach(b => {
@@ -355,13 +420,15 @@ function renderCatalog(){
   catalog.innerHTML = state.puzzle.cats.slice(1).map(cat => `<section class="category-card"><h3>${cat.label}</h3>${cat.items.map(item => `<article><strong>${itemName(item)}</strong><div>${describeItem(item, cat).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('')}</section>`).join('');
 }
 function describeItem(item, cat){
-  const baseAttrs = cat.key === 'bouquets' ? ['colors','scent','catSafety','pricePerStem'] : cat.key === 'locations' ? ['inside','wetness','noise','light','temperature','elevation','distance','tags'] : [];
+  const baseAttrs = cat.key === 'bouquets' ? ['flowers','colors','scent','catSafety','pricePerStem'] : cat.key === 'locations' ? ['inside','wetness','noise','light','temperature','elevation','distance','tags'] : [];
   const clueAttrs = [...(state.puzzle.usedAttributes.get(cat.key) || [])];
   return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => item[attr] !== undefined).map(attr => {
     const rawValues = valuesFor(item, attr);
     const value = rawValues.join(', ');
+    if(attr === 'flowers') return `flowers: ${item.flowers.map(f => itemName(f)).join(' ')}`;
     if(attr === 'colors') return `colors: ${colorDots(rawValues)}`;
     if(attr === 'catSafety') return catSafetyLabel(item[attr]);
+    if(attr === 'pricePerStem') return `price: ${value}`;
     return typeof item[attr] === 'number' ? `${attr}: ${value}` : `${attr}: ${emojifyValue(value)}`;
   });
 }
