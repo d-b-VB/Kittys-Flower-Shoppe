@@ -483,13 +483,13 @@ function check(){
 function reveal(){ state.puzzle.characters.forEach(ch => state.puzzle.cats.slice(1).forEach(cat => setMark(ch, state.puzzle.solution[ch.id][cat.key], 'yes'))); autoFill(); celebrate(); }
 function celebrate(){
   state.completed = true;
-  const butterflies = Array.from({length: 8}, (_, i) => `<span class="butterfly" style="--i:${i};--dx:${(i % 4 - 1.5) * 34}px;--dy:${(i % 3 - 1) * 24}px;--spin:${i % 2 ? 16 : -16}deg">${emojiMarkup('🦋')}</span>`).join('');
+  const butterflies = Array.from({length: 5}, (_, i) => `<span class="butterfly" style="--i:${i};--dx:${(i % 5 - 2) * 58}px;--dy:${(i % 3 - 1) * 40}px;--spin:${i % 2 ? 18 : -18}deg">${emojiMarkup('🦋')}</span>`).join('');
   const sparkles = Array.from({length: 24}, (_, i) => `<span class="sparkle" style="--i:${i};--angle:${i * 15}deg;--burst:${70 + (i % 5) * 18}px">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
   const rows = state.puzzle.characters.map((ch, index) => {
-    const targets = state.puzzle.cats.slice(1).map((cat, targetIndex) => `<span class="victory-target party-emoji" style="--j:${targetIndex}">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
+    const targets = state.puzzle.cats.slice(1).map((cat, targetIndex) => `<span class="victory-target party-emoji" style="--j:${targetIndex}" aria-label="${itemText(state.puzzle.solution[ch.id][cat.key])}">${gridLabel(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
     const rewardAttr = state.puzzle.rewardCustomerAttrs?.get(ch.id);
     const reward = rewardAttr ? `<span class="reward-fact">Bonus: ${formatCustomerAttribute(ch, rewardAttr)}</span>` : '';
-    return `<li class="victory-order" style="--i:${index}"><span class="victory-character party-emoji">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span>${reward}</li>`;
+    return `<li class="victory-order" style="--i:${index}"><span class="victory-character party-emoji" aria-label="${itemText(ch)}">${gridLabel(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span>${reward}</li>`;
   }).join('');
   const box=document.getElementById('celebration');
   box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><button type="button" id="next-puzzle" class="next-puzzle">Next puzzle</button></div>`;
