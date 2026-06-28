@@ -89,6 +89,8 @@ function newPuzzle(customerCount, categoryCount){
   const minimal = makeMinimalClues(puzzle);
   puzzle.clues = minimal.texts;
   puzzle.usedAttributes = minimal.usedAttributes;
+  puzzle.visibleCustomerAttrs = visibleCustomerAttributes(puzzle);
+  puzzle.rewardCustomerAttrs = rewardCustomerAttributes(puzzle);
   return puzzle;
 }
 function ownerOf(puzzle, item){ return puzzle.characters.find(ch => puzzle.solution[ch.id][item.category]?.id === item.id); }
@@ -110,8 +112,17 @@ function relationText(a,b,positive=true){
 }
 function valuesFor(item, attr){ const v=item[attr]; return Array.isArray(v)?v:[v]; }
 function attrClueText(ch, cat, attr, value){
-  const phrase = cat.key === 'bouquets' ? `ordered a flower with ${attr} ${emojifyValue(value)}` : `${verb(cat.key)} something with ${attr} ${emojifyValue(value)}`;
+  const phrase = attributeCluePhrase(cat, attr, value);
   return `${itemName(ch)} ${phrase}.`;
+}
+function attributeCluePhrase(cat, attr, value){
+  if(cat.key === 'bouquets'){
+    if(attr === 'catSafety') return `ordered a flower that is ${catSafetyLabel(value).toLowerCase()}`;
+    if(attr === 'colors') return `ordered a ${emojifyValue(value)} flower`;
+    if(attr === 'scent') return `ordered a flower with ${emojifyValue(value)} scent`;
+    return `ordered a flower with ${attr} ${emojifyValue(value)}`;
+  }
+  return `${verb(cat.key)} something with ${attr} ${emojifyValue(value)}`;
 }
 function activeSharedAttributes(cat){
   const attrs = ['country','continent','texture','hobby','likes','dislikesOrFears','colors','scent','catSafety','inside','wetness','noise','light','temperature','elevation','distance','tags'];
@@ -305,22 +316,40 @@ function setMark(a,b,val){ state.marks.set(key(a,b), val); }
 function getMark(a,b){ return state.marks.get(key(a,b)) || ''; }
 function isCorrectPair(a,b){ return paired(state.puzzle,a,b); }
 function render(){ renderCards(); renderCatalog(); renderClues(); renderGrid(); if(!state.completed) document.getElementById('celebration').classList.add('hidden'); }
+
+const customerFactPool = ['country','heightDisplay','likes','hobby','texture','continent','dislikesOrFears'];
+const customerRewardPool = ['ageDisplay','texture','likes','hobby','dislikesOrFears','heightDisplay','continent'];
+function visibleCustomerAttributes(puzzle){
+  const clueAttrs = [...(puzzle.usedAttributes.get('characters') || [])];
+  const extras = shuffle(customerFactPool.filter(attr => !clueAttrs.includes(attr))).slice(0, 2);
+  return [...new Set([...clueAttrs, ...extras])];
+}
+function rewardCustomerAttributes(puzzle){
+  const visible = new Set(puzzle.visibleCustomerAttrs || []);
+  const rewards = new Map();
+  puzzle.characters.forEach(customer => {
+    const options = customerRewardPool.filter(attr => !visible.has(attr) && customer[attr] !== undefined);
+    rewards.set(customer.id, shuffle(options.length ? options : customerRewardPool.filter(attr => customer[attr] !== undefined))[0]);
+  });
+  return rewards;
+}
+function formatCustomerAttribute(customer, attr){
+  if(attr === 'heightDisplay') return `height: ${customer.heightDisplay}`;
+  if(attr === 'ageDisplay') return `age: ${customer.ageDisplay}`;
+  if(attr === 'country') return `${flag(customer.country)} ${customer.country}`;
+  if(attr === 'likes') return `likes: ${emojifyValues(valuesFor(customer, attr))}`;
+  if(attr === 'dislikesOrFears') return `fears: ${emojifyValues(valuesFor(customer, attr))}`;
+  if(attr === 'hobby') return `hobby: ${emojifyValue(valuesFor(customer, attr).join(', '))}`;
+  return `${attr}: ${emojifyValue(valuesFor(customer, attr).join(', '))}`;
+}
 function renderCards(){
   document.getElementById('order-cards').innerHTML = state.puzzle.characters.map(c => `<article class="order-card"><strong>${itemName(c)}</strong><div>${describeCustomer(c).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('');
 }
 function describeCustomer(customer){
-  const baseAttrs = ['country','heightDisplay','likes','hobby'];
-  const clueAttrs = [...(state.puzzle.usedAttributes.get('characters') || [])];
-  return [...new Set([...baseAttrs, ...clueAttrs])].filter(attr => customer[attr] !== undefined).map(attr => {
-    if(attr === 'heightDisplay') return customer.heightDisplay;
-    const value = valuesFor(customer, attr).join(', ');
-    if(attr === 'country') return `${flag(customer.country)} ${customer.country}`;
-    if(attr === 'likes') return `likes: ${emojifyValues(valuesFor(customer, attr))}`;
-    if(attr === 'dislikesOrFears') return `fears: ${emojifyValues(valuesFor(customer, attr))}`;
-    if(attr === 'hobby') return `hobby: ${emojifyValue(value)}`;
-    return `${attr}: ${emojifyValue(value)}`;
-  });
+  const attrs = state.puzzle.visibleCustomerAttrs || ['country','heightDisplay'];
+  return attrs.filter(attr => customer[attr] !== undefined).map(attr => formatCustomerAttribute(customer, attr));
 }
+
 function renderCatalog(){
   const catalog = document.getElementById('category-cards');
   catalog.innerHTML = state.puzzle.cats.slice(1).map(cat => `<section class="category-card"><h3>${cat.label}</h3>${cat.items.map(item => `<article><strong>${itemName(item)}</strong><div>${describeItem(item, cat).map(t => `<span class="tag">${t}</span>`).join('')}</div></article>`).join('')}</section>`).join('');
@@ -444,11 +473,15 @@ function celebrate(){
   const sparkles = Array.from({length: 14}, (_, i) => `<span class="sparkle" style="--i:${i}">${emojiMarkup(i % 2 ? '✨' : '💖')}</span>`).join('');
   const rows = state.puzzle.characters.map((ch, index) => {
     const targets = state.puzzle.cats.slice(1).map(cat => `<span class="victory-target">${itemName(state.puzzle.solution[ch.id][cat.key])}</span>`).join('');
-    return `<li class="victory-order" style="--i:${index}"><span class="victory-character">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span></li>`;
+    const rewardAttr = state.puzzle.rewardCustomerAttrs?.get(ch.id);
+    const reward = rewardAttr ? `<span class="reward-fact">Bonus: ${formatCustomerAttribute(ch, rewardAttr)}</span>` : '';
+    return `<li class="victory-order" style="--i:${index}"><span class="victory-character">${itemName(ch)}</span><span class="victory-arrow">→</span><span class="victory-targets">${targets}</span>${reward}</li>`;
   }).join('');
   const box=document.getElementById('celebration');
-  box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><p>Everyone bounces together with bouquets, butterflies, and sparkles.</p></div>`;
+  box.innerHTML = `<div class="victory-stage">${butterflies}${sparkles}<h2>Kitty’s deliveries are complete!</h2><ul>${rows}</ul><p>Everyone bounces together with bouquets, butterflies, and sparkles.</p><button type="button" id="next-puzzle" class="next-puzzle">Next puzzle</button></div>`;
   box.classList.remove('hidden');
+  document.getElementById('next-puzzle').addEventListener('click', () => document.getElementById('new-game-form').requestSubmit());
+  requestAnimationFrame(() => box.scrollIntoView({behavior:'smooth', block:'start'}));
   setStatus('Puzzle complete!');
 }
 

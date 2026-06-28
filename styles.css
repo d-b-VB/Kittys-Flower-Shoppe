@@ -162,3 +162,5 @@ h1 {
 }
 .continuous-grid .section-purple.x { background: #dec2ff; }
 .continuous-grid .section-purple.yes { background: linear-gradient(135deg, #c9f8d9, #dec2ff 78%); }
+.next-puzzle { margin-top: .75rem; padding: .55rem .9rem; font-size: .9rem; box-shadow: 0 8px 18px #9933ff22; }
+.reward-fact { flex-basis: 100%; margin-left: .2rem; color: var(--muted); font-size: .9rem; font-weight: 800; }
