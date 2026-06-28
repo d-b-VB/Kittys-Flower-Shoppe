@@ -48,7 +48,7 @@ const factEmoji = emoji => emojiMarkup(emoji);
 const flowerEmojiColors = {rose:['red'], tulip:['pink'], daisy:['white','yellow'], sunflower:['yellow','brown'], hyacinth:['purple'], hibiscus:['pink','yellow'], lotus:['pink'], marigold:['orange','yellow']};
 const categoryEmoji = {characters:'🐱', bouquets:'💐', locations:'📍', treats:'🍬', seafoodDishes:'🍣', generalFoods:'🍽️', drinks:'🧃', ribbons:'🎀', occasions:'🎉', feelings:'😊', deliveryTimes:'🕒'};
 const firstEmoji = item => String(item.emoji || '').split(/\s+/).filter(Boolean)[0] || '❔';
-const gridLabel = item => emojiMarkup(firstEmoji(item));
+const gridLabel = item => item.category === 'bouquets' && item.flowers ? emojiMarkup(item.emoji) : emojiMarkup(firstEmoji(item));
 const categoryGridLabel = key => emojiMarkup(categoryEmoji[key] || '🏷️');
 const colorHex = {red:'#f87171', pink:'#f9a8d4', white:'#ffffff', yellow:'#fde047', brown:'#92400e', purple:'#c084fc', orange:'#fb923c'};
 const catSafetyLabel = value => ({okay:'Safe for cats', PPE:'Not safe for cats'}[value] || value);
